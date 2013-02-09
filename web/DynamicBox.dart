@@ -13,8 +13,6 @@ class DynamicBox extends GameObject {
   
   bool highlight = false;
   
-  double width;
-  double height;
   double origAngle;
   
   DynamicBox(Vector size, Vector position, double restitution, double density, [double angle = 0.0, double friction = 1.0]) {
@@ -62,33 +60,45 @@ class DynamicBox extends GameObject {
     ctx.drawImage(this.texture, -width / 2, -height / 2, this.width, this.height);
     ctx.restore();
 
+    
     // highlight edges of this box
     if (this.highlight || this.hovered) {
-      List<Vector> boundary = this.getRotatedVerticies();
-      ctx.beginPath();
-      ctx.strokeStyle = '#f00';
-      ctx.lineWidth = 1;
-      for (int i=0; i < boundary.length; i++) {
-        if (i == 0) {
-          ctx.moveTo(boundary[i].x * Game.VIEWPORT_SCALE + Game.canvasCenter.x, -boundary[i].y * Game.VIEWPORT_SCALE + Game.canvasCenter.y);
-        } else {
-          ctx.lineTo(boundary[i].x * Game.VIEWPORT_SCALE + Game.canvasCenter.x, -boundary[i].y * Game.VIEWPORT_SCALE + Game.canvasCenter.y);
-        }
-      }
-      ctx.closePath();
-      ctx.stroke();
+      this._drawStroke(ctx, '#f00', 2);
+    } else {
+      ctx.globalAlpha = 0.3;
+      this._drawStroke(ctx, '#000');
+      ctx.globalAlpha = 1;
     }
     
 //    print(this.body.get(this.body.position));
     
+//    ctx.beginPath();
+//    ctx.strokeStyle = '#00f';
+//    ctx.lineWidth = 5;
+//    ctx.moveTo(pos1x-1, pos1y);
+//    ctx.lineTo(pos1x+1, pos1y);
+//    ctx.closePath();
+//    ctx.stroke();
+
+  }
+  
+  void _drawStroke(CanvasRenderingContext2D ctx, String color, [int lineWidth]) {
+    if (!?lineWidth) {
+      lineWidth = 1;
+    }
+    List<Vector> boundary = this.getRotatedVerticies();
     ctx.beginPath();
-    ctx.strokeStyle = '#00f';
-    ctx.lineWidth = 5;
-    ctx.moveTo(pos1x-1, pos1y);
-    ctx.lineTo(pos1x+1, pos1y);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    for (int i=0; i < boundary.length; i++) {
+      if (i == 0) {
+        ctx.moveTo(boundary[i].x * Game.VIEWPORT_SCALE + Game.canvasCenter.x, -boundary[i].y * Game.VIEWPORT_SCALE + Game.canvasCenter.y);
+      } else {
+        ctx.lineTo(boundary[i].x * Game.VIEWPORT_SCALE + Game.canvasCenter.x, -boundary[i].y * Game.VIEWPORT_SCALE + Game.canvasCenter.y);
+      }
+    }
     ctx.closePath();
     ctx.stroke();
-
   }
   
   List<Vector> getRotatedVerticies() {

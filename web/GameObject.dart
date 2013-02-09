@@ -16,6 +16,9 @@ abstract class GameObject {
   
   ImageElement texture;
   
+  double width;
+  double height;
+  
   bool hovered = false;
   
   void addObjectToWorld(World world);

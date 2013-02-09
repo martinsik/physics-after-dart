@@ -23,6 +23,9 @@ class StaticBox extends GameObject {
     this.bodyDef.type = BodyType.STATIC;
     this.bodyDef.position = position;
 
+    this.width = 2 * size.x * Game.VIEWPORT_SCALE;
+    this.height = 2 * size.y * Game.VIEWPORT_SCALE;
+
   }
   
   void addObjectToWorld(World world) {
@@ -31,8 +34,8 @@ class StaticBox extends GameObject {
   }
 
   void draw(CanvasRenderingContext2D ctx) {
-    int lineWidth = 6;
-    ctx.strokeStyle = '#888';
+    int lineWidth = this.height.toInt();
+    ctx.strokeStyle = '#bbb';
     ctx.beginPath();
     ctx.lineWidth = lineWidth;
     
