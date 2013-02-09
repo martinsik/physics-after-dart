@@ -16,7 +16,7 @@ abstract class GameObject {
   
   ImageElement texture;
   
-  bool highlightEdges = false;
+  bool hovered = false;
   
   void addObjectToWorld(World world);
   

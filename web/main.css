@@ -29,6 +29,8 @@ h1, p {
 
 canvas#main_canvas {
   background: #fff;
+  position: absolute;
+  z-index: 100;
 }
 
 #fps {

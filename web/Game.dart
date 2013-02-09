@@ -9,6 +9,7 @@ part 'StaticBox.dart';
 part 'DynamicBox.dart';
 part 'Color.dart';
 part 'ClickedFixture.dart';
+part 'DragHandler.dart';
 
 
 class Game {
@@ -19,16 +20,15 @@ class Game {
   static const int POSITION_ITERATIONS = 10;
   static const int VIEWPORT_SCALE = 10;
   static const double DEGRE_TO_RADIAN = 0.0174532925;
+
+  static Vector canvasCenter;
   
   // All of the bodies in a simulation.
   List<GameObject> grounds;
   List<GameObject> dynamicObjects;
   
-  // HTML element used to display the FPS counter
-  Element fpsCounter;
-  
-  // HTML element used to display the world step time
-  Element worldStepTimeCounter;
+  int canvasFpsCounter = 0;
+  double canvasWorldStepTime = 0.0;
 
   // The debug drawing tool.
   DebugDraw debugDraw;
@@ -55,7 +55,8 @@ class Game {
   // The transform abstraction layer between the world and drawing canvas.
   IViewportTransform viewport;
   
-  static Vector canvasCenter;
+  DragHandler dragHandler;
+  
 
   
   void init() {
@@ -65,9 +66,10 @@ class Game {
     this.stopwatch = new Stopwatch();
     this.grounds = new List<GameObject>();
     this.dynamicObjects = new List<GameObject>();
+    this.dragHandler = new DragHandler();
     
-    fpsCounter = query("#fps-counter");
-    worldStepTimeCounter = query("#step-time-counter");
+//    fpsCounter = query("#fps-counter");
+//    worldStepTimeCounter = query("#step-time-counter");
     
     canvas = query("#main_canvas");
     ctx = canvas.getContext("2d");
@@ -95,12 +97,11 @@ class Game {
     frameCount = 0;
     
     window.setInterval(() {
-      // print('bodies[1]: [${bodies[1].position.x}, ${bodies[1].position.y}]');
-      fpsCounter.innerHtml = frameCount.toString();
+      canvasFpsCounter = frameCount;
       frameCount = 0;
     }, 1000);
     window.setInterval(() {
-      worldStepTimeCounter.innerHtml = "${elapsedUs / 1000} ms";
+      canvasWorldStepTime = elapsedUs / 1000;
     }, 200);
 
     
@@ -110,27 +111,73 @@ class Game {
   }
   
   void _initListeners() {
-    window.onClick.listen((e) {
+//    window.onClick.listen((e) {
+//      for (GameObject o in dynamicObjects) {
+//        o.highlightEdges = false;
+//      }
+//      
+//      Vector pointClicked = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
+//      
+//      ClickedFixture callback = new ClickedFixture();
+//      callback.clickedPos = pointClicked;
+//       
+//      AxisAlignedBox aabb = new AxisAlignedBox(pointClicked, pointClicked);
+//      world.queryAABB(callback, aabb);
+//    });
+    
+    this.canvas.onMouseDown.listen((e) {
+//      Vector pointClicked = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
+      Vector pointClicked = Game.convertCanvasToWorld(new Vector(e.clientX, e.clientY));
+      dragHandler.deactivate();
+      
       for (GameObject o in dynamicObjects) {
-        o.highlightEdges = false;
+        if (o.hovered) {
+//          Vector destPoint = new Vector();
+          
+          dragHandler.activate(pointClicked, o);
+          dragHandler.setDestination(pointClicked);
+          
+          Vector diffFromObjectCenter = new Vector.copy(pointClicked);
+          diffFromObjectCenter.subLocal(o.body.position);
+          dragHandler.relativeDistanceFromObjectCenter = diffFromObjectCenter;
+//          print("tag: ${o.tag}");
+          break;
+        }
       }
       
-//      print('point: [${e.clientX};${e.clientY}]');
-//      print('point from center: [${e.clientX - Game.canvasCenter.x};${e.clientY - Game.canvasCenter.y}]');
-      Vector pointClicked = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
-//      print(pointClicked);
-      
-      ClickedFixture callback = new ClickedFixture();
-      callback.clickedPos = pointClicked;
-//      Body body = new Body();
-//      AxisAlignedBox aabb1 = new AxisAlignedBox(pointClicked, pointClicked);
-//      for (GameObject b in dynamicObjects) {
-//        AxisAlignedBox aabb2 = b.body.
+//      if (mouseDragHandler.isActive()) {
+//        GameObject obj = mouseDragHandler.activeObject();
+//        obj.body.linearVelocity = new Vector(0, 10 * 60);
 //      }
-//       
-      AxisAlignedBox aabb = new AxisAlignedBox(pointClicked, pointClicked);
+
+    });
+    
+    this.canvas.onMouseUp.listen((e) {
+      dragHandler.deactivate();
+//      if (mouseDragHandler.isActive()) {
+//        GameObject obj = mouseDragHandler.activeObject();
+//        obj.body.linearVelocity = new Vector(0, 0);
+//      }
+      
+    });
+    
+    this.canvas.onMouseMove.listen((e) {
+      for (GameObject o in dynamicObjects) {
+        o.hovered = false;
+      }
+      ClickedFixture callback = new ClickedFixture();
+      Vector mousePos = Game.convertCanvasToWorld(new Vector(e.clientX, e.clientY));
+//      callback.mousePos = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
+      callback.mousePos = mousePos;
+      
+      AxisAlignedBox aabb = new AxisAlignedBox(mousePos, mousePos);
       world.queryAABB(callback, aabb);
       
+      if (dragHandler.isActive()) {
+        dragHandler.setDestination(mousePos);
+//        double distance = mouseDragHandler.distanceFromStartAndUpdate(mousePos);
+//        print("distance: $distance");
+      }
     });
     
     window.onResize.listen((e) {
@@ -139,7 +186,7 @@ class Game {
   }
   
   void _createGround() {
-    StaticBox ground = new StaticBox(new Vector(200.0, 1), new Vector(0.0, -22.0));
+    StaticBox ground = new StaticBox(new Vector(200.0, 1), new Vector(0.0, -25.0));
     ground.addObjectToWorld(this.world);
     this.grounds.add(ground);
   }
@@ -192,6 +239,34 @@ class Game {
     world.step(TIME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     elapsedUs = stopwatch.elapsedMicroseconds;
 
+    // Am I draging something?
+    if (dragHandler.isActive()) {
+      double dist = dragHandler.objectDistanceToDestination();
+      GameObject obj = dragHandler.getActiveObject(); 
+//      if (dist < 0.1) {
+//        obj.body.linearVelocity = new Vector(0, 0);
+//        mouseDragHandler.deactivate();
+//      } else {
+      Vector diffVector = new Vector.copy(dragHandler.getCorrectedDestination());
+      diffVector.subLocal(obj.body.position);
+//        print(diffVector);
+      
+      obj.body.linearVelocity = new Vector(diffVector.x * 2, diffVector.y * 2);
+//      }
+      
+//      obj.body.linearVelocity = new Vector(0, 10 * 60);
+      
+    }
+    
+    window.requestAnimationFrame((num time) {
+      _step(time);
+      _draw();
+//      print('bodies: ${bodies.length}');
+//      print('bodies[1]: [${bodies[1].linearVelocity.x}, ${bodies[1].linearVelocity.y}]');
+    });
+  }
+  
+  void _draw() {
     // Clear the animation panel and draw new frame.
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
@@ -208,13 +283,21 @@ class Game {
       object.draw(this.ctx);
     }
     
+    this._drawDebugInfo();
+    
     frameCount++;
-
-    window.requestAnimationFrame((num time) {
-      _step(time);
-//      print('bodies: ${bodies.length}');
-//      print('bodies[1]: [${bodies[1].linearVelocity.x}, ${bodies[1].linearVelocity.y}]');
-    });
+  }
+  
+  void _drawDebugInfo() {
+    this.ctx.fillStyle = '#000';
+    this.ctx.font = '12px courier';
+    this.ctx.textBaseline = 'bottom';
+    this.ctx.fillText("fps: ${this.canvasFpsCounter}, physics step: ${this.canvasWorldStepTime} ms", 5, 20);
+  }
+  
+  static Vector convertCanvasToWorld(Vector canvasVectorOrPoint) {
+    return new Vector((canvasVectorOrPoint.x - Game.canvasCenter.x) / Game.VIEWPORT_SCALE,
+                      (Game.canvasCenter.y - canvasVectorOrPoint.y) / Game.VIEWPORT_SCALE);
   }
   
   /**

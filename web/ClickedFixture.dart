@@ -3,21 +3,22 @@ part of droidtowers;
 
 class ClickedFixture extends QueryCallback {
   
-  Vector clickedPos;
+  Vector mousePos;
   
   bool reportFixture(Fixture fixture) {
     //print((fixture.userData as GameObject).tag);
 //    print('clicked');
     
-    DynamicBox box = fixture.userData;
-    Matrix22 matr = new Matrix22.fromAngle(box.body.angle);
-    Transform trans = new Transform();
-    trans.setFromPositionAndRotation(box.body.position, matr);
-    
-//    print("${box.tag}: ${box.shape.testPoint(trans, this.clickedPos)}");
-    
-    if (box.shape.testPoint(trans, this.clickedPos)) {
-      box.highlightEdges = true;
+//    GameObject box = fixture.userData;
+    if (fixture.userData is DynamicBox) {
+      DynamicBox box = fixture.userData;
+      Matrix22 rotMatrix = new Matrix22.fromAngle(box.body.angle);
+      Transform trans = new Transform();
+      trans.setFromPositionAndRotation(box.body.position, rotMatrix);
+      
+      if (box.shape.testPoint(trans, this.mousePos)) {
+        box.hovered = true;
+      }
     }
     
     return true;

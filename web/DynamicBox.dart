@@ -61,7 +61,7 @@ class DynamicBox extends GameObject {
     ctx.restore();
 
     // highlight edges of this box
-    if (this.highlightEdges) {
+    if (this.hovered) {
       List<Vector> boundary = this.getRotatedVerticies();
       ctx.beginPath();
       ctx.strokeStyle = '#f00';
