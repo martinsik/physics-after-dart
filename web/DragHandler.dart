@@ -7,13 +7,17 @@ class DragHandler {
   
   Vector relativeDistanceFromObjectCenter;
   
-  GameObject _activeObject;
+  DynamicBox _activeObject;
   
   Vector _mousePosStart;
     
   bool _active = false;
   
-  void activate(Vector mousePosStart, GameObject obj) {
+  bool rotateLeft = false;
+  bool rotateRight = false;
+  bool rotateToDefault = false;
+  
+  void activate(Vector mousePosStart, DynamicBox obj) {
     this._active = true;
 //    if (?obj) {
     this._activeObject = obj;
@@ -30,7 +34,7 @@ class DragHandler {
     return this._active;
   }
   
-  GameObject getActiveObject() {
+  DynamicBox getActiveObject() {
     if (this.isActive()) {
       return this._activeObject; 
     } else {

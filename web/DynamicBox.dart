@@ -11,6 +11,8 @@ class DynamicBox extends GameObject {
   
   FixtureDef activeFixtureDef;
   
+  bool highlight = false;
+  
   double width;
   double height;
   double origAngle;
@@ -61,7 +63,7 @@ class DynamicBox extends GameObject {
     ctx.restore();
 
     // highlight edges of this box
-    if (this.hovered) {
+    if (this.highlight || this.hovered) {
       List<Vector> boundary = this.getRotatedVerticies();
       ctx.beginPath();
       ctx.strokeStyle = '#f00';
@@ -82,8 +84,9 @@ class DynamicBox extends GameObject {
     ctx.beginPath();
     ctx.strokeStyle = '#00f';
     ctx.lineWidth = 5;
-    ctx.moveTo(pos1x-2, pos1y);
-    ctx.lineTo(pos1x+2, pos1y);
+    ctx.moveTo(pos1x-1, pos1y);
+    ctx.lineTo(pos1x+1, pos1y);
+    ctx.closePath();
     ctx.stroke();
 
   }

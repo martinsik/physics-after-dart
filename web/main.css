@@ -27,10 +27,16 @@ h1, p {
   margin-top: 140px;
 }
 
-canvas#main_canvas {
-  background: #fff;
+canvas {
+  /*background: #fff;*/
   position: absolute;
-  z-index: 100;
+  /*z-index: 100;*/
+  image-rendering: optimizeQuality;
+}
+
+canvas#shadow_canvas {
+  /*background: #ff0;*/
+  /*opacity: 0.5;*/
 }
 
 #fps {

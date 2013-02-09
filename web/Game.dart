@@ -10,7 +10,8 @@ part 'DynamicBox.dart';
 part 'Color.dart';
 part 'ClickedFixture.dart';
 part 'DragHandler.dart';
-
+part 'LightEngine.dart';
+part 'GameEventHandlers.dart';
 
 class Game {
   
@@ -38,6 +39,7 @@ class Game {
 
   // The drawing canvas.
   CanvasElement canvas;
+  CanvasElement shadowCanvas;
 
   // The canvas rendering context.
   CanvasRenderingContext2D ctx;
@@ -53,11 +55,14 @@ class Game {
   int frameCount;
 
   // The transform abstraction layer between the world and drawing canvas.
-  IViewportTransform viewport;
+//  IViewportTransform viewport;
   
-  DragHandler dragHandler;
+  LightEngine lightEngine;
   
-
+  GameEventHandlers eventHandler;
+  
+  Vector sun;
+  
   
   void init() {
 //    print(window.screen.width);
@@ -66,13 +71,22 @@ class Game {
     this.stopwatch = new Stopwatch();
     this.grounds = new List<GameObject>();
     this.dynamicObjects = new List<GameObject>();
-    this.dragHandler = new DragHandler();
+    this.eventHandler = new GameEventHandlers(this);
     
 //    fpsCounter = query("#fps-counter");
 //    worldStepTimeCounter = query("#step-time-counter");
     
-    canvas = query("#main_canvas");
+    // init HTML elements
+    this.canvas = query("#main_canvas");
+    this.shadowCanvas = query("#shadow_canvas");
     ctx = canvas.getContext("2d");
+    
+    // add sun
+    this.lightEngine = new LightEngine(query("#shadow_canvas"));
+    this.sun = new Vector(-10, 100);
+    this.lightEngine.add(this.sun);
+
+//    ctx.webkitImageSmoothingEnabled = true;
     resizeCanvas();
     
     this._initListeners();
@@ -86,6 +100,7 @@ class Game {
 
     // Create the viewport transform with the center at extents.
     final extents = new Vector(this.canvas.width / 2, this.canvas.height / 2);
+    IViewportTransform viewport;
     viewport = new CanvasViewportTransform(extents, extents);
     viewport.scale = VIEWPORT_SCALE;
     
@@ -111,74 +126,45 @@ class Game {
   }
   
   void _initListeners() {
-//    window.onClick.listen((e) {
-//      for (GameObject o in dynamicObjects) {
-//        o.highlightEdges = false;
-//      }
-//      
-//      Vector pointClicked = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
-//      
-//      ClickedFixture callback = new ClickedFixture();
-//      callback.clickedPos = pointClicked;
-//       
-//      AxisAlignedBox aabb = new AxisAlignedBox(pointClicked, pointClicked);
-//      world.queryAABB(callback, aabb);
-//    });
     
-    this.canvas.onMouseDown.listen((e) {
-//      Vector pointClicked = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
-      Vector pointClicked = Game.convertCanvasToWorld(new Vector(e.clientX, e.clientY));
-      dragHandler.deactivate();
-      
-      for (GameObject o in dynamicObjects) {
-        if (o.hovered) {
-//          Vector destPoint = new Vector();
-          
-          dragHandler.activate(pointClicked, o);
-          dragHandler.setDestination(pointClicked);
-          
-          Vector diffFromObjectCenter = new Vector.copy(pointClicked);
-          diffFromObjectCenter.subLocal(o.body.position);
-          dragHandler.relativeDistanceFromObjectCenter = diffFromObjectCenter;
-//          print("tag: ${o.tag}");
-          break;
+    this.shadowCanvas.onMouseDown.listen((e) {
+      eventHandler.onMouseDown(e);
+    });
+    
+    this.shadowCanvas.onMouseUp.listen((e) {
+      eventHandler.onMouseUp(e);
+    });
+
+    this.shadowCanvas.onMouseMove.listen((e) {
+      eventHandler.onMouseMove(e);
+    });
+    
+    window.onKeyDown.listen((e) {
+      if (this.eventHandler.dragHandler.isActive()) {
+        if (e.keyCode == 37) { // left arrow
+          this.eventHandler.dragHandler.rotateLeft = true;
+        } else if (e.keyCode == 39) { // right arrow
+          this.eventHandler.dragHandler.rotateRight = true;
+        } else if (e.keyCode == 32) { // space
+          // @TODO: rotate to default position
         }
       }
-      
-//      if (mouseDragHandler.isActive()) {
-//        GameObject obj = mouseDragHandler.activeObject();
-//        obj.body.linearVelocity = new Vector(0, 10 * 60);
-//      }
+    });
 
-    });
-    
-    this.canvas.onMouseUp.listen((e) {
-      dragHandler.deactivate();
-//      if (mouseDragHandler.isActive()) {
-//        GameObject obj = mouseDragHandler.activeObject();
-//        obj.body.linearVelocity = new Vector(0, 0);
-//      }
-      
-    });
-    
-    this.canvas.onMouseMove.listen((e) {
-      for (GameObject o in dynamicObjects) {
-        o.hovered = false;
-      }
-      ClickedFixture callback = new ClickedFixture();
-      Vector mousePos = Game.convertCanvasToWorld(new Vector(e.clientX, e.clientY));
-//      callback.mousePos = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
-      callback.mousePos = mousePos;
-      
-      AxisAlignedBox aabb = new AxisAlignedBox(mousePos, mousePos);
-      world.queryAABB(callback, aabb);
-      
-      if (dragHandler.isActive()) {
-        dragHandler.setDestination(mousePos);
-//        double distance = mouseDragHandler.distanceFromStartAndUpdate(mousePos);
-//        print("distance: $distance");
+    window.onKeyUp.listen((e) {
+      if (this.eventHandler.dragHandler.isActive()) {
+        if (e.keyCode == 37) { // left arrow
+          this.eventHandler.dragHandler.rotateLeft = false;
+        } else if (e.keyCode == 39) { // right arrow
+          this.eventHandler.dragHandler.rotateRight = false;
+        } else if (e.keyCode == 32) { // space
+          // @TODO: rotate to default position
+        }
+        
+        this.eventHandler.dragHandler.getActiveObject().body.angularVelocity = 0.0;
       }
     });
+
     
     window.onResize.listen((e) {
       resizeCanvas();
@@ -230,6 +216,8 @@ class Game {
 //    print('resize: [${window.innerWidth}, ${window.innerHeight}]');
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
+    this.shadowCanvas.width = window.innerWidth;
+    this.shadowCanvas.height = window.innerHeight;
     Game.canvasCenter = new Vector(this.canvas.width / 2, this.canvas.height / 2); 
   }
   
@@ -240,18 +228,25 @@ class Game {
     elapsedUs = stopwatch.elapsedMicroseconds;
 
     // Am I draging something?
-    if (dragHandler.isActive()) {
-      double dist = dragHandler.objectDistanceToDestination();
-      GameObject obj = dragHandler.getActiveObject(); 
+    if (this.eventHandler.dragHandler.isActive()) {
+      double dist = this.eventHandler.dragHandler.objectDistanceToDestination();
+      GameObject obj = this.eventHandler.dragHandler.getActiveObject(); 
 //      if (dist < 0.1) {
 //        obj.body.linearVelocity = new Vector(0, 0);
 //        mouseDragHandler.deactivate();
 //      } else {
-      Vector diffVector = new Vector.copy(dragHandler.getCorrectedDestination());
+      Vector diffVector = new Vector.copy(this.eventHandler.dragHandler.getCorrectedDestination());
       diffVector.subLocal(obj.body.position);
 //        print(diffVector);
       
       obj.body.linearVelocity = new Vector(diffVector.x * 2, diffVector.y * 2);
+      
+      if (this.eventHandler.dragHandler.rotateLeft) {
+        obj.body.angularVelocity = 1.0;
+      } else if (this.eventHandler.dragHandler.rotateRight) {
+        obj.body.angularVelocity = -1.0;
+      }
+      
 //      }
       
 //      obj.body.linearVelocity = new Vector(0, 10 * 60);
@@ -268,6 +263,7 @@ class Game {
   
   void _draw() {
     // Clear the animation panel and draw new frame.
+//    ctx.fillStyle = "#fff";
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
     // draw debug rectangles 
@@ -282,6 +278,8 @@ class Game {
     for (GameObject object in this.dynamicObjects) {
       object.draw(this.ctx);
     }
+    
+    this.lightEngine.draw(this.dynamicObjects);
     
     this._drawDebugInfo();
     
