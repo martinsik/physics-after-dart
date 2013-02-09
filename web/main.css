@@ -39,6 +39,15 @@ canvas#shadow_canvas {
   /*opacity: 0.5;*/
 }
 
+div#start_critters {
+  width: 150px;
+  height: 40px;
+  background: red;
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
 #fps {
   position: absolute;
 }

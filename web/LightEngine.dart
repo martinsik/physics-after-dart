@@ -65,8 +65,13 @@ class LightEngine {
     Vector canvasSun = new Vector.copy(sun);
     Game.convertWorldToCanvas(canvasSun);
     
-    for (DynamicBox box in objects) {
+    for (GameObject box in objects) {
+      if (box is! DynamicBox) {
+        continue;
+      }
+      
       this.canvasTmp.width = this.canvasTmp.width;
+      
       List<Vector> verticies = box.getRotatedVerticies();
       
 //      Vector intersect = new Vector();
@@ -124,11 +129,11 @@ class LightEngine {
       strippedIntersections.add(intersections[maxVertexIndex]);
       
       // strip middle intersection
-      print(strippedIntersections);
+//      print(strippedIntersections);
 //      intersections.sort(this._pointsSortMethodX);
 //      intersections.removeAt(1);
 //      intersections.removeAt(2);
-      print(strippedIntersections);
+//      print(strippedIntersections);
       
       if (Game.debug) {
         this.secondTmpCtx.strokeStyle = '#f00';
