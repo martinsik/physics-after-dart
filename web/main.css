@@ -7,7 +7,16 @@ body {
   line-height: 1.2em;*/
   margin: 0;
   padding: 0;
+}
+
+#wrapper {
+  position: absolute;
+  max-width: 1000px;
+  max-height: 706px;
+  margin-left: auto;
+  margin-right: auto;
   background-position: center bottom;
+  background-repeat: no-repeat;
 }
 
 h1, p {
@@ -33,6 +42,8 @@ canvas {
   position: absolute;
   /*z-index: 100;*/
   image-rendering: optimizeQuality;
+  /*max-height: 706px !important;
+  max-width: 706px !important;*/
 }
 
 canvas#shadow_canvas {
@@ -40,14 +51,56 @@ canvas#shadow_canvas {
   /*opacity: 0.5;*/
 }
 
+div.level,
+div#levels_label,
+div#level_progess,
 div#start_critters {
-  width: 150px;
-  height: 40px;
-  background: red;
   position: absolute;
-  left: 10px;
-  top: 10px;
+  font-family: Rationale;
+  font-size: 28px;
+  height: 30px;
+  padding: 5px;
+  z-index: 200;
+  text-transform: uppercase;
+  text-align: center;
+  top: 20px;
+  background: #F5EA56;
+}
+
+div#start_critters {
+  left: 20px;
+  width: 120px;
+}
+
+div.level:hover,
+div#start_critters:hover {
+  /*background: #E3D94F;*/
+  background: white;
+  cursor: pointer;
+}
+
+div.level {
+  width: 20px;
+}
+
+div#levels_label {
+  left: 760px;
+  width: 90px;
+}
+
+div#level1 {
+  left: 870px;
+}
+div#level2 {
+  left: 910px;
+}
+div#level3 {
+  left: 950px;
+}
+div #level_progess {
   display: none;
+  left: 160px;
+  width: 60px;
 }
 
 #fps {

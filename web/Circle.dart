@@ -7,6 +7,8 @@ class Circle extends GameObject {
   
   FixtureDef activeFixtureDef;
 
+  Circle() : super();
+  
   
   void addObjectToWorld(World world) {
     this.body = world.createBody(this.bodyDef);
@@ -28,12 +30,6 @@ class Circle extends GameObject {
     
     first.addLocal(this.body.position);
     second.addLocal(this.body.position);
-    
-//    Game.convertWorldToCanvas(first);
-//    Game.convertWorldToCanvas(second);
-    
-//    print(first);
-//    print(second);
     
     return [first, second];
     

@@ -26,6 +26,9 @@ abstract class GameObject {
   
   void draw(CanvasRenderingContext2D ctx);
 
+  GameObject() {
+    this.tag = static_counter++;
+  }
   
   double getCurrentAngle() {
     return -this.body.angle - this.origAngle; 

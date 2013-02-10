@@ -17,6 +17,7 @@ part 'GameEventHandlers.dart';
 part 'Levels.dart';
 part 'Circle.dart';
 part 'Critter.dart';
+part 'EndSolver.dart';
 
 
 class Game {
@@ -27,6 +28,7 @@ class Game {
   static const int POSITION_ITERATIONS = 5;
   static const int VIEWPORT_SCALE = 10;
   static const int MOVE_VELOCITY = 5;
+  static const int CRITTER_SPAWN_RADIUS = 6;
   static const double DEGRE_TO_RADIAN = 0.0174532925;
 
   static Vector canvasCenter;
@@ -50,6 +52,10 @@ class Game {
   // The drawing canvas.
   CanvasElement canvas;
   CanvasElement shadowCanvas;
+  
+  DivElement mainButtonElm;
+  DivElement wrapperElm;
+  DivElement progressElm;
 
   // The canvas rendering context.
   CanvasRenderingContext2D ctx;
@@ -57,6 +63,8 @@ class Game {
   // For timing the world.step call. It is kept running but reset and polled
   // every frame to minimize overhead.
   Stopwatch stopwatch;
+  
+  Math.Random randomGenerator;
 
 //  double groundHeight = 2.0;
   double groundLevel = 0.0;
@@ -76,7 +84,14 @@ class Game {
   
   Vector sun;
   
+  EndSolver endSolver;
+  
   double groundHeight = 1.0;
+  
+  Map level;
+  
+  bool running = false;
+  
   
   void init() {
 //    print(window.screen.width);
@@ -96,10 +111,13 @@ class Game {
     // init HTML elements
     this.canvas = query("#main_canvas");
     this.shadowCanvas = query("#shadow_canvas");
-    ctx = canvas.getContext("2d");
+    this.mainButtonElm = query("#start_critters");
+    this.wrapperElm = query("#wrapper");
+    this.progressElm = query("#level_progess");
+    this.ctx = canvas.getContext("2d");
     resizeCanvas();
     
-    this._reset();
+    this.loadLevel();
     
     this._initListeners();
 
@@ -130,7 +148,13 @@ class Game {
     
   }
   
-  void _reset() {
+  void loadLevel([int level]) {
+    if (!?level) {
+      level = 0;
+    }
+    
+    this.progressElm.hidden = true;
+    
     this.grounds = new List<GameObject>();
     this.dynamicObjects = new List<GameObject>();
     this.critters = new List<Critter>(); 
@@ -139,15 +163,30 @@ class Game {
 //    this._createGround(groundHeight);
     
     this.lightEngine = new LightEngine(query("#shadow_canvas"), this.groundLevel + groundHeight);
-    this.sun = new Vector(0, Game.canvasCenter.y / Game.VIEWPORT_SCALE);
-    this.lightEngine.add(this.sun);
 
-    Map level = Levels.getLevel(0);
-    this._createBoxes(level['boxes']);
-    this._createGround(this.groundHeight, level['grounds']);
-    document.body.style.backgroundImage = "url(./images/${level['background']})";
+    this.level = Levels.getLevel(0);
+    
+    this.sun = new Vector(this.level['sun_x'], Game.canvasCenter.y / Game.VIEWPORT_SCALE);
+    this.lightEngine.add(this.sun);
+    
+    this._createBoxes(this.level['boxes']);
+    this._createGround(this.groundHeight, this.level['grounds']);
+    this.wrapperElm.style.backgroundImage = "url(./images/${this.level['background']})";
     double aspect = this.canvas.height / 1000.0;
-    document.body.style.backgroundSize = "${aspect * 1500}px ${aspect * 1000}px";
+    this.wrapperElm.style.backgroundSize = "${aspect * 1500}px ${aspect * 1000}px";
+    
+    // add start and end triangles
+//    List points = level['start'];
+    List<Vector> endVectorPoints = new List<Vector>();
+    for (List point in this.level['end']) {
+      endVectorPoints.add(new Vector(point[0], point[1]));
+    }
+
+    this.endSolver = new EndSolver(endVectorPoints,
+        new Vector(this.level['critters']['spawn_point'][0], this.level['critters']['spawn_point'][1]),
+        this.critters, this);
+    
+    this.randomGenerator = new Math.Random(this.level['critters']['seed']);
     
 //    print(Levels.getLevel(0));
   }
@@ -163,7 +202,9 @@ class Game {
     });
 
     this.shadowCanvas.onMouseMove.listen((e) {
-      eventHandler.onMouseMove(e);
+      if (!running) {
+        eventHandler.onMouseMove(e);
+      }
     });
     
     window.onKeyDown.listen((e) {
@@ -194,6 +235,20 @@ class Game {
 
     window.onResize.listen((e) {
       resizeCanvas();
+    });
+    
+    // bind start button click
+    this.mainButtonElm.onClick.listen((e) {
+      if (running) {
+        stopCritters();
+        this.mainButtonElm.text = 'start';
+        this.progressElm.style.display = "none";
+      } else {
+        startCritters();
+        this.mainButtonElm.text = 'stop';
+        this.progressElm.style.display = "block";
+        this.updateProgressElm();
+      }
     });
   }
   
@@ -241,23 +296,50 @@ class Game {
       
       this.dynamicObjects.add(box);
     }
-    
-    Critter c1 = new Critter(2.0, new Vector(20, 0));
-    c1.setTexture("./images/circle.png");
-    c1.addObjectToWorld(this.world);
-    
-    this.dynamicObjects.add(c1);
-    
+        
   }
   
 
   void resizeCanvas() {
 //    print('resize: [${window.innerWidth}, ${window.innerHeight}]');
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
-    this.shadowCanvas.width = window.innerWidth;
-    this.shadowCanvas.height = window.innerHeight;
-    Game.canvasCenter = new Vector(this.canvas.width / 2, this.canvas.height / 2); 
+//    int height = window.innerHeight > 706 ? 706 : ;
+    int height = 706;
+    int width = 1000;
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.shadowCanvas.width = width;
+    this.shadowCanvas.height = height;
+    this.wrapperElm.style.width = "${width}px";
+    this.wrapperElm.style.height = "${height}px";
+    Game.canvasCenter = new Vector(width / 2, height / 2); 
+  }
+  
+  void startCritters() {
+    this.running = true;
+    
+    Map crittersSettings = this.level['critters'];
+    Vector spawnPoint = new Vector(crittersSettings['spawn_point'][0], crittersSettings['spawn_point'][1]);
+    
+    for (int i=0; i < crittersSettings['count']; i++) {
+      Vector randomPosition = new Vector.copy(spawnPoint);
+      randomPosition.x = randomPosition.x + this.randomGenerator.nextDouble() * CRITTER_SPAWN_RADIUS;
+      randomPosition.y = randomPosition.y + this.randomGenerator.nextDouble() * CRITTER_SPAWN_RADIUS;
+      
+      Critter critter = new Critter(2.0, randomPosition);
+      critter.addObjectToWorld(this.world);
+      
+      this.dynamicObjects.add(critter);
+      this.critters.add(critter);
+    }
+  }
+  
+  void stopCritters() {
+    this.running = false;
+    for (Critter c in this.critters) {
+      this.world.destroyBody(c.body);
+      this.dynamicObjects.remove(c);
+    }
+    this.critters.clear();
   }
   
   /** Advances the world forward by timestep seconds. */
@@ -281,9 +363,9 @@ class Game {
       obj.body.linearVelocity = new Vector(diffVector.x * Game.MOVE_VELOCITY, diffVector.y * Game.MOVE_VELOCITY);
       
       if (this.eventHandler.dragHandler.rotateLeft) {
-        obj.body.angularVelocity = 1.0;
+        obj.body.angularVelocity = 1.5;
       } else if (this.eventHandler.dragHandler.rotateRight) {
-        obj.body.angularVelocity = -1.0;
+        obj.body.angularVelocity = -1.5;
       } else {
         obj.body.angularVelocity = obj.body.angularVelocity / 1.05;
       }
@@ -298,6 +380,7 @@ class Game {
     window.requestAnimationFrame((num time) {
       _step(time);
       _draw();
+      this.endSolver.check();
 //      print('bodies: ${bodies.length}');
 //      print('bodies[1]: [${bodies[1].linearVelocity.x}, ${bodies[1].linearVelocity.y}]');
     });
@@ -319,16 +402,49 @@ class Game {
       ground.draw(this.ctx);
     }
     
+    this.endSolver.draw(this.ctx);
+    
+    // can't remove critter from list inside iteration (Dart's feature)
+    Critter removeMe;
+    bool itemToRemove = false;
+    
     // draw dynamic bodies
     for (GameObject object in this.dynamicObjects) {
       object.draw(this.ctx);
+      
+      if (object is Critter) {
+        if (object.opacity < 0.05) {
+          world.destroyBody(object.body);
+          removeMe = object;
+          itemToRemove = true;
+        }
+      }
+    }
+    if (itemToRemove) {
+      dynamicObjects.remove(removeMe);
+      critters.remove(removeMe);
+      this.updateProgressElm();
+      if (this.isDone()) {
+        
+      }
     }
     
     this.lightEngine.draw(this.dynamicObjects);
     
-    this._drawDebugInfo();
+    if (Game.debug) {
+      this._drawDebugInfo();
+    }
     
     frameCount++;
+  }
+  
+  void updateProgressElm() {
+    int crittersPassed = this.level['critters']['count'] - this.critters.length;
+    this.progressElm.text = "${crittersPassed}/${this.level['critters']['count']}";
+  }
+  
+  bool isDone() {
+    return this.critters.length == 0;
   }
   
   void _drawDebugInfo() {
@@ -347,7 +463,7 @@ class Game {
     worldVectorOrPoint.x = worldVectorOrPoint.x * Game.VIEWPORT_SCALE + Game.canvasCenter.x;
     worldVectorOrPoint.y = -worldVectorOrPoint.y * Game.VIEWPORT_SCALE + Game.canvasCenter.y;
   }
-
+  
   /**
    * Starts running the demo as an animation using an animation scheduler.
    */

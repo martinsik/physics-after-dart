@@ -8,7 +8,7 @@ class StaticBox extends BasicBoxObject {
   
   PolygonShape shape;
   
-  StaticBox(Vector size, Vector position, [double angle]) {
+  StaticBox(Vector size, Vector position, [double angle]): super() {
     if (!?angle) {
       angle = 0.0;
     }

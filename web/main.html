@@ -4,14 +4,25 @@
   <head>
     <meta charset="utf-8">
     <title>Tower</title>
+    <link href='http://fonts.googleapis.com/css?family=Rationale' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="./main.css">
+    
   </head>
   <body>
-    
-    <div id="start_critters"></div>
-    
-    <canvas id="main_canvas"></canvas>
-    <canvas id="shadow_canvas"></canvas>
+    <div id="wrapper">
+      <div id="start_critters">start</div>
+      <div id="level_progess"></div>
+      
+      <div id="levels_label">levels:&nbsp;</div>
+      <div id="level1" class="level">1</div>
+      <div id="level2" class="level">2</div>
+      <div id="level3" class="level">3</div>
+      
+      
+      
+      <canvas id="main_canvas"></canvas>
+      <canvas id="shadow_canvas"></canvas>
+    </div>
     
 
     <script type="application/dart" src="./Game.dart"></script>

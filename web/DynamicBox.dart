@@ -13,7 +13,7 @@ class DynamicBox extends BasicBoxObject {
   
   bool highlight = false;
   
-  DynamicBox(Vector size, Vector position, double restitution, double density, [double angle = 0.0, double friction = 1.0]) {
+  DynamicBox(Vector size, Vector position, double restitution, double density, [double angle = 0.0, double friction = 1.0]): super() {
     
     this.shape = new PolygonShape();
     this.shape.setAsBoxWithCenterAndAngle(size.x, size.y, new Vector(0, 0), angle * Game.DEGRE_TO_RADIAN);

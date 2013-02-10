@@ -3,8 +3,11 @@ part of droidtowers;
 
 class Critter extends Circle {
   
+  double opacity = 1.0;
+  bool fadeOut = false;
   
-  Critter(double radius, Vector position) {
+  Critter(double radius, Vector position): super() {
+    
     this.width = radius;
     this.height = radius;
     
@@ -12,9 +15,9 @@ class Critter extends Circle {
     this.shape.radius = radius;
     
     this.activeFixtureDef = new FixtureDef();
-    this.activeFixtureDef.restitution = 0.60;
-    this.activeFixtureDef.density = 0.3;
-    this.activeFixtureDef.friction = 0.8;
+    this.activeFixtureDef.restitution = 0.70;
+    this.activeFixtureDef.density = 0.4;
+    this.activeFixtureDef.friction = 0.9;
     this.activeFixtureDef.shape = this.shape;
     this.activeFixtureDef.userData = this;
 
@@ -22,7 +25,8 @@ class Critter extends Circle {
     this.bodyDef.type = BodyType.DYNAMIC;
     this.bodyDef.position = position;
     
-    this.tag = GameObject.static_counter++;
+//    this.tag = GameObject.static_counter++;
+    this.setTexture("./images/circle.png");
   }
 
   
@@ -34,6 +38,14 @@ class Critter extends Circle {
 
     double radius = this.shape.radius * Game.VIEWPORT_SCALE;
     
+    if (this.fadeOut) {
+      ctx.globalAlpha = this.opacity;
+      this.opacity = this.opacity - 0.05;
+//      if (this.opacity < 0.0) {
+//        this.fadeOut = false;
+//      }
+    }
+    
     ctx.save();
     ctx.beginPath();
     ctx.translate(pos1x, pos1y);
@@ -43,6 +55,10 @@ class Critter extends Circle {
     ctx.fill();
     ctx.restore();
     
+    if (this.fadeOut) {
+      ctx.globalAlpha = 1;
+    }
+
 //    ctx.save();
 //    ctx.beginPath();
 //    ctx.translate(pos1x, pos1y);
