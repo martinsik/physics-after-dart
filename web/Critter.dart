@@ -1,12 +1,8 @@
 
 part of droidtowers;
 
-class Critter extends GameObject {
+class Critter extends Circle {
   
-  CircleShape shape;
-  
-  FixtureDef activeFixtureDef;
-
   
   Critter(double radius, Vector position) {
     this.width = radius;
@@ -16,9 +12,9 @@ class Critter extends GameObject {
     this.shape.radius = radius;
     
     this.activeFixtureDef = new FixtureDef();
-    this.activeFixtureDef.restitution = 0.80;
-    this.activeFixtureDef.density = 0.5;
-    this.activeFixtureDef.friction = 0.5;
+    this.activeFixtureDef.restitution = 0.60;
+    this.activeFixtureDef.density = 0.3;
+    this.activeFixtureDef.friction = 0.8;
     this.activeFixtureDef.shape = this.shape;
     this.activeFixtureDef.userData = this;
 
@@ -28,11 +24,7 @@ class Critter extends GameObject {
     
     this.tag = GameObject.static_counter++;
   }
-  
-  void addObjectToWorld(World world) {
-    this.body = world.createBody(this.bodyDef);
-    this.body.createFixture(this.activeFixtureDef);
-  }
+
   
   void draw(CanvasRenderingContext2D ctx) {
 //    print('draw');
@@ -45,11 +37,20 @@ class Critter extends GameObject {
     ctx.save();
     ctx.beginPath();
     ctx.translate(pos1x, pos1y);
-    ctx.fillStyle = "#f00";
-    ctx.arc(0, 0, this.width * Game.VIEWPORT_SCALE, 0, Math.PI*2, true); 
+    ctx.rotate(this.getCurrentAngle());
+    ctx.drawImage(this.texture, -radius, -radius, radius * 2, radius * 2);
     ctx.closePath();
     ctx.fill();
     ctx.restore();
+    
+//    ctx.save();
+//    ctx.beginPath();
+//    ctx.translate(pos1x, pos1y);
+//    ctx.fillStyle = "#f00";
+//    ctx.arc(0, 0, this.width * Game.VIEWPORT_SCALE, 0, Math.PI*2, true); 
+//    ctx.closePath();
+//    ctx.fill();
+//    ctx.restore();
     
   }
 

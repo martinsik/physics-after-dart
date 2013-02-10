@@ -18,13 +18,20 @@ abstract class GameObject {
   
   double width;
   double height;
+  double origAngle = 0.0;
   
   bool hovered = false;
   
   void addObjectToWorld(World world);
   
   void draw(CanvasRenderingContext2D ctx);
- 
+
+  
+  double getCurrentAngle() {
+    return -this.body.angle - this.origAngle; 
+  }
+  
+  
   void setTexture(String imagePath) {
     this.texture = new Element.tag('img');
 //    image.onLoad.listen((e) {
@@ -33,7 +40,7 @@ abstract class GameObject {
 //    });
     this.texture.src = imagePath;
   }
-  
+ 
   
 }
 

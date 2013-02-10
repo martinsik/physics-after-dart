@@ -1,12 +1,13 @@
 
 body {
-  background-color: #F8F8F8;
+  /*background-color: #F8F8F8;*/
   font-family: 'Open Sans', sans-serif;
   font-size: 14px;
-  font-weight: normal;
-  line-height: 1.2em;
+  /*font-weight: normal;
+  line-height: 1.2em;*/
   margin: 0;
   padding: 0;
+  background-position: center bottom;
 }
 
 h1, p {
@@ -46,6 +47,7 @@ div#start_critters {
   position: absolute;
   left: 10px;
   top: 10px;
+  display: none;
 }
 
 #fps {

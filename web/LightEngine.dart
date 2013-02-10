@@ -66,13 +66,19 @@ class LightEngine {
     Game.convertWorldToCanvas(canvasSun);
     
     for (GameObject box in objects) {
-      if (box is! DynamicBox) {
+      List<Vector> verticies;
+      if (box is BasicBoxObject) {
+        verticies = box.getRotatedVerticies();
+      } else if (box is Circle) {
+        verticies = box.getRotatedVerticies(sun);
+//        continue;
+      } else {
         continue;
       }
       
       this.canvasTmp.width = this.canvasTmp.width;
       
-      List<Vector> verticies = box.getRotatedVerticies();
+//      List<Vector> verticies = box.getRotatedVerticies();
       
 //      Vector intersect = new Vector();
 
@@ -181,13 +187,29 @@ class LightEngine {
       
       double pos1x = (box.body.position.x) * Game.VIEWPORT_SCALE + Game.canvasCenter.x;
       double pos1y = -(box.body.position.y) * Game.VIEWPORT_SCALE + Game.canvasCenter.y;
+            
+      if (box is BasicBoxObject) {
+        // remove box from canvas
+        this.tmpCtx.save();
+        this.tmpCtx.translate(pos1x, pos1y);
+        this.tmpCtx.rotate(box.getCurrentAngle());
+        this.tmpCtx.clearRect(-box.width / 2, -box.height / 2, box.width, box.height);
+        this.tmpCtx.restore();
+      } else if (box is Circle) {
+        this.tmpCtx.globalCompositeOperation = 'destination-out';
 
-      // remove box from canvas
-      this.tmpCtx.save();
-      this.tmpCtx.translate(pos1x, pos1y);
-      this.tmpCtx.rotate(box.getCurrentAngle());
-      this.tmpCtx.clearRect(-box.width / 2, -box.height / 2, box.width, box.height);
-      this.tmpCtx.restore();
+        this.tmpCtx.save();
+        this.tmpCtx.beginPath();
+        this.tmpCtx.translate(pos1x, pos1y);
+        this.tmpCtx.fillStyle = "#f00";
+        this.tmpCtx.arc(0, 0, box.shape.radius * Game.VIEWPORT_SCALE, 0, Math.PI*2, true); 
+        this.tmpCtx.closePath();
+        this.tmpCtx.fill();
+        this.tmpCtx.restore();
+
+        this.tmpCtx.globalCompositeOperation = 'source-over';
+      }
+      
       
 //      this.tmpCtx.clearRect(box.body., 0, this.canvas.width, this.canvas.height);
 //      this.tmpCtx.rotate(angle)
@@ -196,7 +218,7 @@ class LightEngine {
     }
 
     
-    this.ctx.globalAlpha = 0.2;
+    this.ctx.globalAlpha = 0.3;
     this.ctx.drawImage(this.secondCanvasTmp, 0, 0, this.canvas.width, this.canvas.height);
     
 

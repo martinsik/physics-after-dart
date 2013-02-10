@@ -6,6 +6,7 @@ import 'dart:json' as json;
 import 'package:box2d/box2d_browser.dart';
 
 part 'GameObject.dart';
+part 'BasicBoxObject.dart';
 part 'StaticBox.dart';
 part 'DynamicBox.dart';
 part 'Color.dart';
@@ -14,16 +15,18 @@ part 'DragHandler.dart';
 part 'LightEngine.dart';
 part 'GameEventHandlers.dart';
 part 'Levels.dart';
+part 'Circle.dart';
 part 'Critter.dart';
+
 
 class Game {
   
   static const num GRAVITY = -50;
   static const num TIME_STEP = 1/60;
-  static const int VELOCITY_ITERATIONS = 10;
-  static const int POSITION_ITERATIONS = 10;
+  static const int VELOCITY_ITERATIONS = 5;
+  static const int POSITION_ITERATIONS = 5;
   static const int VIEWPORT_SCALE = 10;
-  static const int MOVE_VELOCITY = 3;
+  static const int MOVE_VELOCITY = 5;
   static const double DEGRE_TO_RADIAN = 0.0174532925;
 
   static Vector canvasCenter;
@@ -33,7 +36,7 @@ class Game {
   List<GameObject> dynamicObjects;
   List<Critter> critters;
   
-  static const bool debug = true;
+  static const bool debug = false;
   
   int canvasFpsCounter = 0;
   double canvasWorldStepTime = 0.0;
@@ -73,7 +76,7 @@ class Game {
   
   Vector sun;
   
-  double groundHeight = 6.0;
+  double groundHeight = 1.0;
   
   void init() {
 //    print(window.screen.width);
@@ -130,7 +133,7 @@ class Game {
   void _reset() {
     this.grounds = new List<GameObject>();
     this.dynamicObjects = new List<GameObject>();
-    this.critters = List<Critter>(); 
+    this.critters = new List<Critter>(); 
     
     this.groundLevel = -Game.canvasCenter.y / Game.VIEWPORT_SCALE;
 //    this._createGround(groundHeight);
@@ -141,8 +144,10 @@ class Game {
 
     Map level = Levels.getLevel(0);
     this._createBoxes(level['boxes']);
-    this._createGround(this.groundHeight);
-    
+    this._createGround(this.groundHeight, level['grounds']);
+    document.body.style.backgroundImage = "url(./images/${level['background']})";
+    double aspect = this.canvas.height / 1000.0;
+    document.body.style.backgroundSize = "${aspect * 1500}px ${aspect * 1000}px";
     
 //    print(Levels.getLevel(0));
   }
@@ -192,13 +197,13 @@ class Game {
     });
   }
   
-  void _createGround(double height) {
+  void _createGround(double height, List moreGrounds) {
     StaticBox ground;
     ground = new StaticBox(new Vector(200.0, height / 2), new Vector(0.0, this.groundLevel + height / 2));
     ground.addObjectToWorld(this.world);
     this.grounds.add(ground);
     
-    ground = new StaticBox(new Vector(200.0, 0.4), new Vector(0.0, Game.canvasCenter.y / Game.VIEWPORT_SCALE));
+    ground = new StaticBox(new Vector(200.0, 1.0), new Vector(0.0, Game.canvasCenter.y / Game.VIEWPORT_SCALE));
     ground.addObjectToWorld(this.world);
     this.grounds.add(ground);
 
@@ -209,6 +214,15 @@ class Game {
     ground = new StaticBox(new Vector(1.0, (Game.canvasCenter.y * 2) / Game.VIEWPORT_SCALE), new Vector(-Game.canvasCenter.x / Game.VIEWPORT_SCALE, 0));
     ground.addObjectToWorld(this.world);
     this.grounds.add(ground);
+    
+    for (List groundDefinition in moreGrounds) { 
+      ground = new StaticBox(new Vector(groundDefinition[2], groundDefinition[3]),
+                             new Vector(groundDefinition[0], groundDefinition[1]),
+                             groundDefinition[4]);
+      ground.addObjectToWorld(this.world);
+      this.grounds.add(ground);
+      this.dynamicObjects.add(ground);
+    }
     
   }
   
@@ -229,41 +243,11 @@ class Game {
     }
     
     Critter c1 = new Critter(2.0, new Vector(20, 0));
+    c1.setTexture("./images/circle.png");
     c1.addObjectToWorld(this.world);
     
     this.dynamicObjects.add(c1);
     
-//    DynamicBox box;
-//    box = new DynamicBox(new Vector(3.0, 3.0), new Vector(-10.0, 10.0), 0.1, 1.0);
-//    box.addObjectToWorld(this.world);
-//    box.setTexture('./images/crate2.jpg');
-//    this.dynamicObjects.add(box);
-//    
-//    box = new DynamicBox(new Vector(2.0, 2.0), new Vector(-10.0, 15.0), 0.1, 1.0, 44.0);
-//    box.addObjectToWorld(this.world);
-//    box.setTexture('./images/crate2.jpg');
-//    this.dynamicObjects.add(box);
-//
-//    box = new DynamicBox(new Vector(3.0, 3.0), new Vector(10.0, 25.0), 0.1, 1.0, 30.0);
-//    box.addObjectToWorld(this.world);
-//    box.setTexture('./images/crate2.jpg');
-//    this.dynamicObjects.add(box);
-//    
-//    box = new DynamicBox(new Vector(5.0, 5.0), new Vector(0.0, 12.0), 0.1, 1.0, -10.0);
-//    box.addObjectToWorld(this.world);
-//    box.setTexture('./images/crate2.jpg');
-//    this.dynamicObjects.add(box);
-//    
-//    box = new DynamicBox(new Vector(3.0, 3.0), new Vector(-4.0, 25.0), 0.1, 1.0, 10.0);
-//    box.addObjectToWorld(this.world);
-//    box.setTexture('./images/crate2.jpg');
-//    this.dynamicObjects.add(box);
-//
-//    box = new DynamicBox(new Vector(15.0, 3.0), new Vector(-4.0, 45.0), 0.1, 1.0, 10.0);
-//    box.addObjectToWorld(this.world);
-//    box.setTexture('./images/crate2.jpg');
-//    this.dynamicObjects.add(box);
-
   }
   
 
@@ -282,7 +266,7 @@ class Game {
     world.step(TIME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     elapsedUs = stopwatch.elapsedMicroseconds;
 
-    // Am I draging something?
+    // am I draging something?
     if (this.eventHandler.dragHandler.isActive()) {
       double dist = this.eventHandler.dragHandler.objectDistanceToDestination();
       GameObject obj = this.eventHandler.dragHandler.getActiveObject(); 
@@ -325,8 +309,10 @@ class Game {
 //    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.canvas.width = this.canvas.width;
     
-    // draw debug rectangles 
-    world.drawDebugData();
+    // draw debug rectangles
+    if (Game.debug) {
+      world.drawDebugData();
+    }
 
     // draw grounds
     for (GameObject ground in this.grounds) {
@@ -346,7 +332,7 @@ class Game {
   }
   
   void _drawDebugInfo() {
-    this.ctx.fillStyle = '#000';
+    this.ctx.fillStyle = '#ddd';
     this.ctx.font = '12px courier';
     this.ctx.textBaseline = 'bottom';
     this.ctx.fillText("fps: ${this.canvasFpsCounter}, physics step: ${this.canvasWorldStepTime} ms", 5, 20);

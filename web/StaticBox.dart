@@ -4,7 +4,7 @@
 
 part of droidtowers;
 
-class StaticBox extends GameObject {
+class StaticBox extends BasicBoxObject {
   
   PolygonShape shape;
   
@@ -35,7 +35,7 @@ class StaticBox extends GameObject {
 
   void draw(CanvasRenderingContext2D ctx) {
     int lineWidth = this.height.toInt();
-    ctx.strokeStyle = '#bbb';
+    ctx.strokeStyle = '#000';
     ctx.beginPath();
     ctx.lineWidth = lineWidth;
     
@@ -71,6 +71,7 @@ class StaticBox extends GameObject {
 //    ctx.closePath();
 //    ctx.fill();
   }
+  
 
   
 }

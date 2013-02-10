@@ -15,7 +15,10 @@ class GameEventHandlers {
     Vector pointClicked = Game.convertCanvasToWorld(new Vector(e.clientX, e.clientY));
     this.dragHandler.deactivate();
     
-    for (DynamicBox o in game.dynamicObjects) {
+    for (GameObject o in game.dynamicObjects) {
+      if (o is! DynamicBox) {
+        continue;
+      }
       if (o.hovered) {
         o.highlight = true;
 //          Vector destPoint = new Vector();

@@ -5,15 +5,13 @@
 
 part of droidtowers;
 
-class DynamicBox extends GameObject {
+class DynamicBox extends BasicBoxObject {
   
   PolygonShape shape;
   
   FixtureDef activeFixtureDef;
   
   bool highlight = false;
-  
-  double origAngle;
   
   DynamicBox(Vector size, Vector position, double restitution, double density, [double angle = 0.0, double friction = 1.0]) {
     
@@ -38,10 +36,6 @@ class DynamicBox extends GameObject {
     this.tag = GameObject.static_counter++;
   }
   
-  double getCurrentAngle() {
-    return -this.body.angle - this.origAngle; 
-  }
-  
   void addObjectToWorld(World world) {
     this.body = world.createBody(this.bodyDef);
     this.body.createFixture(this.activeFixtureDef);
@@ -63,10 +57,10 @@ class DynamicBox extends GameObject {
     
     // highlight edges of this box
     if (this.highlight || this.hovered) {
-      this._drawStroke(ctx, '#f00', 2);
+      this._drawStroke(ctx, '#fff', 2);
     } else {
-      ctx.globalAlpha = 0.3;
-      this._drawStroke(ctx, '#000');
+      ctx.globalAlpha = 0.5;
+      this._drawStroke(ctx, '#000', 1);
       ctx.globalAlpha = 1;
     }
     
@@ -101,47 +95,5 @@ class DynamicBox extends GameObject {
     ctx.stroke();
   }
   
-  List<Vector> getRotatedVerticies() {
-//    for (int i=0; i < this.shape.vertexCount; i++) {
-//      
-//}
-    
-// hWidth, hHeight = half the rectangle's width & height
-// _xpos, _ypos = center position of the rectangle
-
-    List<Vector> verticies = new List<Vector>();
-    
-    double _xpos = this.body.position.x;
-    double _ypos = -this.body.position.y;
-    double rad = -this.body.angle - this.origAngle;
-    
-    Matrix22 rotMatrix = new Matrix22.fromAngle(rad); 
-    
-    double hWidth = this.width / 2 / Game.VIEWPORT_SCALE;
-    double hHeight = this.height / 2 / Game.VIEWPORT_SCALE;
-    double tX, tY;
-    
-    tX = -(hWidth * Math.cos(rad) - hHeight * Math.sin(rad) ) + _xpos;
-    tY = -(hWidth * Math.sin(rad) + hHeight * Math.cos(rad) ) + _ypos;
-    
-    verticies.add(new Vector(tX, -tY));
-    
-    tX = -(hWidth * Math.cos(rad) + hHeight * Math.sin(rad) ) + _xpos;
-    tY = -(hWidth * Math.sin(rad) - hHeight * Math.cos(rad) ) + _ypos;
-    
-    verticies.add(new Vector(tX, -tY));
-    
-    tX = (hWidth * Math.cos(rad) - hHeight * Math.sin(rad) ) + _xpos;
-    tY = (hWidth * Math.sin(rad) + hHeight * Math.cos(rad) ) + _ypos;
-    
-    verticies.add(new Vector(tX, -tY));
-    
-    tX = (hWidth * Math.cos(rad) + hHeight * Math.sin(rad) ) + _xpos;
-    tY = (hWidth * Math.sin(rad) - hHeight * Math.cos(rad) ) + _ypos;
-    
-    verticies.add(new Vector(tX, -tY));
-    
-    return verticies;
-  }
   
 }
