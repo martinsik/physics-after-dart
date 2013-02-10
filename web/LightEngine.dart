@@ -130,9 +130,9 @@ class LightEngine {
 //      }
       
       
-      List<Vector> strippedIntersections = new List<Vector>();
-      strippedIntersections.add(intersections[minVertexIndex]);
-      strippedIntersections.add(intersections[maxVertexIndex]);
+//      List<Vector> strippedIntersections = new List<Vector>();
+//      strippedIntersections.add(intersections[minVertexIndex]);
+//      strippedIntersections.add(intersections[maxVertexIndex]);
       
       // strip middle intersection
 //      print(strippedIntersections);
@@ -145,10 +145,10 @@ class LightEngine {
         this.secondTmpCtx.strokeStyle = '#f00';
         this.secondTmpCtx.beginPath();
         this.secondTmpCtx.moveTo(canvasSun.x, canvasSun.y);
-        this.secondTmpCtx.lineTo(strippedIntersections[0].x, strippedIntersections[0].y);
+        this.secondTmpCtx.lineTo(intersections[minVertexIndex].x, intersections[minVertexIndex].y);
         this.secondTmpCtx.stroke();
         this.secondTmpCtx.moveTo(canvasSun.x, canvasSun.y);
-        this.secondTmpCtx.lineTo(strippedIntersections[1].x, strippedIntersections[1].y);
+        this.secondTmpCtx.lineTo(intersections[maxVertexIndex].x, intersections[maxVertexIndex].y);
         this.secondTmpCtx.stroke();
         this.secondTmpCtx.closePath();
       }
@@ -175,10 +175,10 @@ class LightEngine {
       // draw shadow
       this.tmpCtx.strokeStyle = '#000';
       this.tmpCtx.beginPath();
-      this.tmpCtx.moveTo(strippedIntersections[0].x, strippedIntersections[0].y);
+      this.tmpCtx.moveTo(intersections[minVertexIndex].x, intersections[minVertexIndex].y);
       this.tmpCtx.lineTo(verticies[minVertexIndex].x, verticies[minVertexIndex].y);
       this.tmpCtx.lineTo(verticies[maxVertexIndex].x, verticies[maxVertexIndex].y);
-      this.tmpCtx.lineTo(strippedIntersections[1].x, strippedIntersections[1].y);
+      this.tmpCtx.lineTo(intersections[maxVertexIndex].x, intersections[maxVertexIndex].y);
       this.tmpCtx.fill();
       this.tmpCtx.closePath();
       

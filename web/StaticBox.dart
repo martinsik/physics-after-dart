@@ -25,6 +25,7 @@ class StaticBox extends BasicBoxObject {
 
     this.width = 2 * size.x * Game.VIEWPORT_SCALE;
     this.height = 2 * size.y * Game.VIEWPORT_SCALE;
+    this.origAngle = angle * Game.DEGRE_TO_RADIAN;
 
   }
   
@@ -34,23 +35,42 @@ class StaticBox extends BasicBoxObject {
   }
 
   void draw(CanvasRenderingContext2D ctx) {
-    int lineWidth = this.height.toInt();
-    ctx.strokeStyle = '#000';
+    
+//    ctx.save();
+//    int lineWidth = this.height.toInt();
+    ctx.fillStyle = '#000';
     ctx.beginPath();
-    ctx.lineWidth = lineWidth;
-    
-    double pos1x = (this.body.position.x + this.shape.vertices[2].x) * Game.VIEWPORT_SCALE + Game.canvasCenter.x;
-    double pos1y = -(this.body.position.y + this.shape.vertices[2].y) * Game.VIEWPORT_SCALE + Game.canvasCenter.y + lineWidth/2;
-    double pos2x = (this.body.position.x + this.shape.vertices[3].x) * Game.VIEWPORT_SCALE + Game.canvasCenter.x;
-    double pos2y = -(this.body.position.y + this.shape.vertices[3].y) * Game.VIEWPORT_SCALE + Game.canvasCenter.y + lineWidth/2;
+//    ctx.lineWidth = lineWidth;
+//    
+//    double pos1x = (this.body.position.x + this.shape.vertices[2].x) * Game.VIEWPORT_SCALE + Game.canvasCenter.x;
+//    double pos1y = -(this.body.position.y + this.shape.vertices[2].y) * Game.VIEWPORT_SCALE + Game.canvasCenter.y + lineWidth/2;
+//    double pos2x = (this.body.position.x + this.shape.vertices[3].x) * Game.VIEWPORT_SCALE + Game.canvasCenter.x;
+//    double pos2y = -(this.body.position.y + this.shape.vertices[3].y) * Game.VIEWPORT_SCALE + Game.canvasCenter.y + lineWidth/2;
+//
+////    print(this.shape.vertices);
+////    print("$pos1x, $pos1y, $pos2x, $pos2y");
+//    
+//    
+//    
+//    ctx.translate(pos1x, pos1y);
+//    ctx.rotate(this.getCurrentAngle());
+//    ctx.moveTo(pos1x, pos1y);
+//    ctx.lineTo(pos2x, pos2y);
+//    ctx.closePath();
+//    ctx.stroke();
+//    
+//    ctx.restore();
 
-//    print(this.shape.vertices);
-//    print("$pos1x, $pos1y, $pos2x, $pos2y");
+    List<Vector> verticies = this.getRotatedVerticies();
+    Game.convertWorldToCanvas(verticies[0]);
+    Game.convertWorldToCanvas(verticies[1]);
+    Game.convertWorldToCanvas(verticies[2]);
+    Game.convertWorldToCanvas(verticies[3]);
     
-    ctx.moveTo(pos1x, pos1y);
-    ctx.lineTo(pos2x, pos2y);
-    ctx.closePath();
-    ctx.stroke();
+    ctx.moveTo(verticies[0].x, verticies[0].y);
+    ctx.lineTo(verticies[1].x, verticies[1].y);
+    ctx.lineTo(verticies[2].x, verticies[2].y);
+    ctx.lineTo(verticies[3].x, verticies[3].y);
 
 //    this.shape.vertices.
     
@@ -68,8 +88,8 @@ class StaticBox extends BasicBoxObject {
 //    ctx.lineTo(0, 0);
 //    ctx.lineTo(50, 100);
 //    ctx.lineTo(0, 90);
-//    ctx.closePath();
-//    ctx.fill();
+    ctx.closePath();
+    ctx.fill();
   }
   
 

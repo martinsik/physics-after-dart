@@ -8,8 +8,8 @@ abstract class BasicBoxObject extends GameObject {
     
     List<Vector> verticies = new List<Vector>();
     
-    double _xpos = this.body.position.x;
-    double _ypos = -this.body.position.y;
+    double _xpos = this.body.position.x.toDouble();
+    double _ypos = -this.body.position.y.toDouble();
     double rad = -this.body.angle - this.origAngle;
     
 //    Matrix22 rotMatrix = new Matrix22.fromAngle(rad); 

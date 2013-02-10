@@ -18,13 +18,16 @@ part 'Levels.dart';
 part 'Circle.dart';
 part 'Critter.dart';
 part 'EndSolver.dart';
+part 'Common.dart';
 
 
 class Game {
   
+  static const bool debug = false;
+  
   static const num GRAVITY = -50;
   static const num TIME_STEP = 1/60;
-  static const int VELOCITY_ITERATIONS = 5;
+  static const int VELOCITY_ITERATIONS = 10;
   static const int POSITION_ITERATIONS = 5;
   static const int VIEWPORT_SCALE = 10;
   static const int MOVE_VELOCITY = 5;
@@ -37,8 +40,6 @@ class Game {
   List<GameObject> grounds;
   List<GameObject> dynamicObjects;
   List<Critter> critters;
-  
-  static const bool debug = false;
   
   int canvasFpsCounter = 0;
   double canvasWorldStepTime = 0.0;
@@ -56,6 +57,7 @@ class Game {
   DivElement mainButtonElm;
   DivElement wrapperElm;
   DivElement progressElm;
+  DivElement doneElm;
 
   // The canvas rendering context.
   CanvasRenderingContext2D ctx;
@@ -92,6 +94,8 @@ class Game {
   
   bool running = false;
   
+  List<String> quotes = [ 'nice job!', 'congratulations!', 'done!', 'great job!' ];
+  
   
   void init() {
 //    print(window.screen.width);
@@ -101,10 +105,6 @@ class Game {
     
     this.eventHandler = new GameEventHandlers(this);
     
-    // create physics world
-    Vector gravity = new Vector(0, GRAVITY);
-    this.world = new World(gravity, true, new DefaultWorldPool());
-
 //    fpsCounter = query("#fps-counter");
 //    worldStepTimeCounter = query("#step-time-counter");
     
@@ -114,10 +114,11 @@ class Game {
     this.mainButtonElm = query("#start_critters");
     this.wrapperElm = query("#wrapper");
     this.progressElm = query("#level_progess");
+    this.doneElm = query("#done");
     this.ctx = canvas.getContext("2d");
     resizeCanvas();
     
-    this.loadLevel();
+    this.loadLevel(0);
     
     this._initListeners();
 
@@ -153,6 +154,14 @@ class Game {
       level = 0;
     }
     
+    this.resetUI();
+    
+    // create physics world
+    Vector gravity = new Vector(0, GRAVITY);
+    this.world = new World(gravity, true, new DefaultWorldPool());
+    
+    this.running = false;
+    this.doneElm.style.display = "none";
     this.progressElm.hidden = true;
     
     this.grounds = new List<GameObject>();
@@ -164,7 +173,7 @@ class Game {
     
     this.lightEngine = new LightEngine(query("#shadow_canvas"), this.groundLevel + groundHeight);
 
-    this.level = Levels.getLevel(0);
+    this.level = Levels.getLevel(level);
     
     this.sun = new Vector(this.level['sun_x'], Game.canvasCenter.y / Game.VIEWPORT_SCALE);
     this.lightEngine.add(this.sun);
@@ -240,16 +249,31 @@ class Game {
     // bind start button click
     this.mainButtonElm.onClick.listen((e) {
       if (running) {
-        stopCritters();
-        this.mainButtonElm.text = 'start';
-        this.progressElm.style.display = "none";
+        this.stopCritters();
+        this.resetUI();
       } else {
-        startCritters();
+        this.startCritters();
         this.mainButtonElm.text = 'stop';
         this.progressElm.style.display = "block";
         this.updateProgressElm();
       }
     });
+    
+    document.query('#play_again').onClick.listen((e) {
+      this.loadLevel(level['id']);
+    });
+    
+    for (DivElement elm in document.queryAll('.level')) {
+      elm.onClick.listen((e) {
+        DivElement elm = e.target;
+        loadLevel(int.parse(elm.text) - 1);
+      });
+    }
+  }
+  
+  void resetUI() {
+    this.mainButtonElm.text = 'start';
+    this.progressElm.style.display = "none";
   }
   
   void _createGround(double height, List moreGrounds) {
@@ -396,6 +420,16 @@ class Game {
     if (Game.debug) {
       world.drawDebugData();
     }
+    
+    // draw sun
+    Vector sunPos = new Vector(this.sun.x, this.sun.y);
+    Game.convertWorldToCanvas(sunPos);
+    this.ctx.beginPath();
+    this.ctx.arc(sunPos.x, 3, 10, 0, 2 * Math.PI, false);
+    this.ctx.lineWidth = 15;
+    this.ctx.strokeStyle = '#fff';
+    this.ctx.stroke();
+    this.ctx.closePath();
 
     // draw grounds
     for (GameObject ground in this.grounds) {
@@ -424,9 +458,7 @@ class Game {
       dynamicObjects.remove(removeMe);
       critters.remove(removeMe);
       this.updateProgressElm();
-      if (this.isDone()) {
-        
-      }
+      this.handleDone();
     }
     
     this.lightEngine.draw(this.dynamicObjects);
@@ -443,8 +475,12 @@ class Game {
     this.progressElm.text = "${crittersPassed}/${this.level['critters']['count']}";
   }
   
-  bool isDone() {
-    return this.critters.length == 0;
+  void handleDone() {
+    if (this.critters.length == 0) {
+      this.quotes = Common.shuffle(this.quotes);
+      document.query('#stripe h2').text = this.quotes[0];
+      this.doneElm.style.display = "block";
+    }
   }
   
   void _drawDebugInfo() {

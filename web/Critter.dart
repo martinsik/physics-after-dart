@@ -15,7 +15,7 @@ class Critter extends Circle {
     this.shape.radius = radius;
     
     this.activeFixtureDef = new FixtureDef();
-    this.activeFixtureDef.restitution = 0.70;
+    this.activeFixtureDef.restitution = 0.80;
     this.activeFixtureDef.density = 0.4;
     this.activeFixtureDef.friction = 0.9;
     this.activeFixtureDef.shape = this.shape;
