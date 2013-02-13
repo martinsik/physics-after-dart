@@ -7,7 +7,7 @@
 }
 
 body {
-  /*background-color: #F8F8F8;*/
+  background-color: black;
   font-family: 'Open Sans', sans-serif;
   font-size: 14px;
   /*font-weight: normal;
@@ -15,11 +15,8 @@ body {
 }
 
 #wrapper {
-  position: absolute;
   max-width: 1000px;
-  max-height: 706px;
-  margin-left: auto;
-  margin-right: auto;
+  max-height: 700px;
   background-position: center bottom;
   background-repeat: no-repeat;
 }
@@ -52,6 +49,8 @@ canvas {
 }
 
 canvas#shadow_canvas {
+  width: 1000px;
+  height: 700px;
   /*background: #ff0;*/
   /*opacity: 0.5;*/
 }
@@ -62,6 +61,9 @@ div {
 
 div.button,
 div.level,
+div#debug_timing,
+div#debug_textures_button,
+div#debug_shadows_button,
 div#levels_label,
 div#level_progess,
 div#start_critters {
@@ -74,11 +76,17 @@ div#start_critters {
   background: #F5EA56;
 }
 
+div#debug {
+  display: none;
+}
+
 div#start_critters {
   left: 20px;
   width: 120px;
 }
 
+div#debug_textures_button:hover,
+div#debug_shadows_button:hover,
 div#play_again:hover,
 div.level:hover,
 div#start_critters:hover {
@@ -150,5 +158,24 @@ div#level_progess {
 
 }
 
-#fps {
+#debug {
+  top: 70px;
+  left: 20px;
+}
+
+div#debug_textures_button,
+div#debug_shadows_button,
+div#debug_timing {
+  text-align: left;
+  float: left;
+  width: 120px;
+  font-size: 16px;
+  height: auto;
+}
+
+div#debug_textures_button {
+  top: 170px;
+}
+div#debug_shadows_button {
+  top: 210px;
 }

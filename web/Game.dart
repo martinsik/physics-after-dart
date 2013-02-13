@@ -19,11 +19,10 @@ part 'Circle.dart';
 part 'Critter.dart';
 part 'EndSolver.dart';
 part 'Common.dart';
+part 'Debug.dart';
 
 
 class Game {
-  
-  static const bool debug = false;
   
   static const num GRAVITY = -50;
   static const num TIME_STEP = 1/60;
@@ -32,9 +31,15 @@ class Game {
   static const int VIEWPORT_SCALE = 10;
   static const int MOVE_VELOCITY = 5;
   static const int CRITTER_SPAWN_RADIUS = 6;
+  static const int CANVAS_WIDTH = 1000;
+  static const int CANVAS_HEIGHT = 700;
   static const double DEGRE_TO_RADIAN = 0.0174532925;
 
+  // view transformation from physics world coordinates to canvas
+  static IViewportTransform viewport;
+
   static Vector canvasCenter;
+  static Vector canvasOffset;
   
   // All of the bodies in a simulation.
   List<GameObject> grounds;
@@ -43,7 +48,7 @@ class Game {
   
   int canvasFpsCounter = 0;
   double canvasWorldStepTime = 0.0;
-
+  
   // The debug drawing tool.
   DebugDraw debugDraw;
 
@@ -58,25 +63,17 @@ class Game {
   DivElement wrapperElm;
   DivElement progressElm;
   DivElement doneElm;
-
+  
   // The canvas rendering context.
   CanvasRenderingContext2D ctx;
-
-  // For timing the world.step call. It is kept running but reset and polled
-  // every frame to minimize overhead.
-  Stopwatch stopwatch;
   
   Math.Random randomGenerator;
 
 //  double groundHeight = 2.0;
   double groundLevel = 0.0;
   
-  // Microseconds for world step update
-  int elapsedUs;
+  Debug debug;
   
-  // Frame count for fps
-  int frameCount;
-
   // The transform abstraction layer between the world and drawing canvas.
 //  IViewportTransform viewport;
   
@@ -101,7 +98,6 @@ class Game {
 //    print(window.screen.width);
 //    print(window.screen.height);
     
-    this.stopwatch = new Stopwatch();
     
     this.eventHandler = new GameEventHandlers(this);
     
@@ -115,6 +111,9 @@ class Game {
     this.wrapperElm = query("#wrapper");
     this.progressElm = query("#level_progess");
     this.doneElm = query("#done");
+    
+    this.debug = new Debug();
+    
     this.ctx = canvas.getContext("2d");
     resizeCanvas();
     
@@ -124,7 +123,6 @@ class Game {
 
     // Create the viewport transform with the center at extents.
     final extents = new Vector(this.canvas.width / 2, this.canvas.height / 2);
-    IViewportTransform viewport;
     viewport = new CanvasViewportTransform(extents, extents);
     viewport.scale = VIEWPORT_SCALE;
     
@@ -133,17 +131,7 @@ class Game {
 
     // Have the world draw itself for debugging purposes.
     world.debugDraw = debugDraw;
-    frameCount = 0;
-    
-    window.setInterval(() {
-      canvasFpsCounter = frameCount;
-      frameCount = 0;
-    }, 1000);
-    window.setInterval(() {
-      canvasWorldStepTime = elapsedUs / 1000;
-    }, 200);
-
-    
+        
 //    Body ground;
 //    ground = world.createBody(bd);
     
@@ -171,7 +159,7 @@ class Game {
     this.groundLevel = -Game.canvasCenter.y / Game.VIEWPORT_SCALE;
 //    this._createGround(groundHeight);
     
-    this.lightEngine = new LightEngine(query("#shadow_canvas"), this.groundLevel + groundHeight);
+    this.lightEngine = new LightEngine(query("#shadow_canvas"), this.ctx, this.groundLevel + groundHeight);
 
     this.level = Levels.getLevel(level);
     
@@ -226,6 +214,17 @@ class Game {
           // @TODO: rotate to default position
         }
       }
+      
+      if (e.keyCode == 68) {
+        if (Debug.isEnabled()) {
+          this.debug.hideDebugWindow();
+        } else {
+          this.debug.showDebugWindow();
+        }
+//        Debug.showWindow = !Debug.showWindow;
+        
+      }
+//      print(e.keyCode);
     });
 
     window.onKeyUp.listen((e) {
@@ -269,6 +268,11 @@ class Game {
         loadLevel(int.parse(elm.text) - 1);
       });
     }
+    
+    // debug
+//    this.debugTexturesButtonElm.onClick.listen((e) {
+//      this.progressElm.style.display = "none";
+//    });
   }
   
   void resetUI() {
@@ -278,11 +282,11 @@ class Game {
   
   void _createGround(double height, List moreGrounds) {
     StaticBox ground;
-    ground = new StaticBox(new Vector(200.0, height / 2), new Vector(0.0, this.groundLevel + height / 2));
+    ground = new StaticBox(new Vector(50.0, height / 2), new Vector(0.0, this.groundLevel + height / 2));
     ground.addObjectToWorld(this.world);
     this.grounds.add(ground);
     
-    ground = new StaticBox(new Vector(200.0, 1.0), new Vector(0.0, Game.canvasCenter.y / Game.VIEWPORT_SCALE));
+    ground = new StaticBox(new Vector(50.0, 1.0), new Vector(0.0, Game.canvasCenter.y / Game.VIEWPORT_SCALE));
     ground.addObjectToWorld(this.world);
     this.grounds.add(ground);
 
@@ -327,15 +331,23 @@ class Game {
   void resizeCanvas() {
 //    print('resize: [${window.innerWidth}, ${window.innerHeight}]');
 //    int height = window.innerHeight > 706 ? 706 : ;
-    int height = 706;
-    int width = 1000;
-    this.canvas.width = width;
-    this.canvas.height = height;
-    this.shadowCanvas.width = width;
-    this.shadowCanvas.height = height;
-    this.wrapperElm.style.width = "${width}px";
-    this.wrapperElm.style.height = "${height}px";
-    Game.canvasCenter = new Vector(width / 2, height / 2); 
+//    int height = 700;
+//    int width = 1000;
+    this.canvas.width = CANVAS_WIDTH;
+    this.canvas.height = CANVAS_HEIGHT;
+//    this.shadowCanvas.width = CANVAS_WIDTH;
+//    this.shadowCanvas.height = CANVAS_HEIGHT;
+    this.shadowCanvas.width = CANVAS_WIDTH ~/ 2; // ~/ integer division
+    this.shadowCanvas.height = CANVAS_HEIGHT ~/ 2;
+    this.wrapperElm.style.width = "${CANVAS_WIDTH}px";
+    this.wrapperElm.style.height = "${CANVAS_HEIGHT}px";
+    
+    Game.canvasCenter = new Vector(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+    Game.canvasOffset = new Vector((window.innerWidth - CANVAS_WIDTH) / 2, (window.innerHeight - CANVAS_HEIGHT) / 2);
+    
+    this.wrapperElm.style.top = "${canvasOffset.y}px";
+    this.wrapperElm.style.left = "${canvasOffset.x}px";
+    
   }
   
   void startCritters() {
@@ -368,21 +380,22 @@ class Game {
   
   /** Advances the world forward by timestep seconds. */
   void _step(num timestamp) {
-    stopwatch.reset();
+    if (Debug.isEnabled()) {
+      this.debug.physicsStopwatch.reset();
+    }
+    
     world.step(TIME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-    elapsedUs = stopwatch.elapsedMicroseconds;
+    
+    if (Debug.isEnabled()) {
+      this.debug.stepElapsedUs = this.debug.physicsStopwatch.elapsedMicroseconds;
+    }
 
     // am I draging something?
     if (this.eventHandler.dragHandler.isActive()) {
       double dist = this.eventHandler.dragHandler.objectDistanceToDestination();
       GameObject obj = this.eventHandler.dragHandler.getActiveObject(); 
-//      if (dist < 0.1) {
-//        obj.body.linearVelocity = new Vector(0, 0);
-//        mouseDragHandler.deactivate();
-//      } else {
       Vector diffVector = new Vector.copy(this.eventHandler.dragHandler.getCorrectedDestination());
       diffVector.subLocal(obj.body.position);
-//        print(diffVector);
       
       obj.body.linearVelocity = new Vector(diffVector.x * Game.MOVE_VELOCITY, diffVector.y * Game.MOVE_VELOCITY);
       
@@ -394,17 +407,20 @@ class Game {
         obj.body.angularVelocity = obj.body.angularVelocity / 1.05;
       }
       
-      
-//      }
-      
-//      obj.body.linearVelocity = new Vector(0, 10 * 60);
-      
     }
     
     window.requestAnimationFrame((num time) {
       _step(time);
       _draw();
+      
+      if (Debug.isEnabled()) {
+        this.debug.endSolverStopwatch.reset();
+      }
       this.endSolver.check();
+      if (Debug.isEnabled()) {
+        this.debug.endSolverElapsedUs = this.debug.endSolverStopwatch.elapsedMicroseconds;
+      }
+
 //      print('bodies: ${bodies.length}');
 //      print('bodies[1]: [${bodies[1].linearVelocity.x}, ${bodies[1].linearVelocity.y}]');
     });
@@ -417,34 +433,46 @@ class Game {
     this.canvas.width = this.canvas.width;
     
     // draw debug rectangles
-    if (Game.debug) {
+    if (Debug.showTextures) {
+      // draw sun
+      Vector sunPos = new Vector(this.sun.x, this.sun.y);
+      Game.convertWorldToCanvas(sunPos);
+      this.ctx.beginPath();
+      this.ctx.arc(sunPos.x, 3, 10, 0, 2 * Math.PI, false);
+      this.ctx.lineWidth = 15;
+      this.ctx.strokeStyle = '#fff';
+      this.ctx.stroke();
+      this.ctx.closePath();
+  
+      if (Debug.isEnabled()) {
+        this.debug.staticDrawStopwatch.reset();
+      }
+      for (StaticBox ground in this.grounds) {
+        ground.draw(this.ctx);
+      }
+      this.endSolver.draw(this.ctx);
+      
+      if (Debug.isEnabled()) {
+        this.debug.staticDrawElapsedUs = this.debug.staticDrawStopwatch.elapsedMicroseconds;
+      }
+    } else {
       world.drawDebugData();
     }
     
-    // draw sun
-    Vector sunPos = new Vector(this.sun.x, this.sun.y);
-    Game.convertWorldToCanvas(sunPos);
-    this.ctx.beginPath();
-    this.ctx.arc(sunPos.x, 3, 10, 0, 2 * Math.PI, false);
-    this.ctx.lineWidth = 15;
-    this.ctx.strokeStyle = '#fff';
-    this.ctx.stroke();
-    this.ctx.closePath();
 
-    // draw grounds
-    for (GameObject ground in this.grounds) {
-      ground.draw(this.ctx);
-    }
-    
-    this.endSolver.draw(this.ctx);
     
     // can't remove critter from list inside iteration (Dart's feature)
     Critter removeMe;
     bool itemToRemove = false;
     
-    // draw dynamic bodies
+    // draw dnamic objects
+    if (Debug.isEnabled()) {
+      this.debug.dynamicDrawStopwatch.reset();
+    }
     for (GameObject object in this.dynamicObjects) {
-      object.draw(this.ctx);
+      if (Debug.showTextures) {
+        object.draw(this.ctx);
+      }
       
       if (object is Critter) {
         if (object.opacity < 0.05) {
@@ -461,13 +489,18 @@ class Game {
       this.handleDone();
     }
     
-    this.lightEngine.draw(this.dynamicObjects);
-    
-    if (Game.debug) {
-      this._drawDebugInfo();
-    }
-    
-    frameCount++;
+//    if (Debug.showShadows) {
+      if (Debug.isEnabled()) {
+        this.debug.dynamicDrawElapsedUs = this.debug.dynamicDrawStopwatch.elapsedMicroseconds;
+        this.debug.shadowsStopwatch.reset();
+      }
+      // draw shadowns
+      this.lightEngine.draw(this.dynamicObjects);
+      if (Debug.isEnabled()) {
+        this.debug.shadowElapsedUs = this.debug.shadowsStopwatch.elapsedMicroseconds;
+        this.debug.thisSecondframeCount++;
+      }
+//    }
   }
   
   void updateProgressElm() {
@@ -483,12 +516,12 @@ class Game {
     }
   }
   
-  void _drawDebugInfo() {
-    this.ctx.fillStyle = '#ddd';
-    this.ctx.font = '12px courier';
-    this.ctx.textBaseline = 'bottom';
-    this.ctx.fillText("fps: ${this.canvasFpsCounter}, physics step: ${this.canvasWorldStepTime} ms", 5, 20);
-  }
+//  void _drawDebugInfo() {
+//    this.ctx.fillStyle = '#ddd';
+//    this.ctx.font = '12px courier';
+//    this.ctx.textBaseline = 'bottom';
+//    this.ctx.fillText("fps: ${this.canvasFpsCounter}, physics step: ${this.canvasWorldStepTime} ms", 5, 20);
+//  }
   
   static Vector convertCanvasToWorld(Vector canvasVectorOrPoint) {
     return new Vector((canvasVectorOrPoint.x - Game.canvasCenter.x) / Game.VIEWPORT_SCALE,
@@ -504,7 +537,7 @@ class Game {
    * Starts running the demo as an animation using an animation scheduler.
    */
   void run() {
-    this.stopwatch.start();
+//    this.stopwatch.start();
     window.requestAnimationFrame((num time) { _step(time); });
   }
   

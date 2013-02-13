@@ -4,7 +4,7 @@ part of droidtowers;
 abstract class BasicBoxObject extends GameObject {
   
 
-  List<Vector> getRotatedVerticies() {
+  List<Vector> getRotatedVerticies([Vector lightSource]) {
     
     List<Vector> verticies = new List<Vector>();
     

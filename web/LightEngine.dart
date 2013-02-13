@@ -4,6 +4,7 @@ part of droidtowers;
 class LightEngine {
   
   CanvasRenderingContext2D ctx;
+  CanvasRenderingContext2D mainCtx;
   CanvasRenderingContext2D tmpCtx;
   CanvasRenderingContext2D secondTmpCtx;
   CanvasElement canvas;
@@ -12,9 +13,15 @@ class LightEngine {
   double groundLevel;
   
   List<Vector> lights;
+  
+  Vector bottomPoint;
+  Vector bottomVector;
+  Vector canvasSun;
+  
+  
 //  LightEngine(Vector pos) : this.position = pos;
   
-  LightEngine(CanvasElement elm, double groundLevel) {
+  LightEngine(CanvasElement elm, CanvasRenderingContext2D mainCtx, double groundLevel) {
     this.lights = new List<Vector>();
     this.canvas = elm;
     this.groundLevel = groundLevel;
@@ -29,12 +36,23 @@ class LightEngine {
     this.ctx = elm.getContext("2d");
     this.tmpCtx = this.canvasTmp.getContext("2d");
     this.secondTmpCtx = this.secondCanvasTmp.getContext("2d");
+    this.mainCtx = mainCtx;
+    
+    this.bottomPoint = new Vector(0, this.groundLevel);
+    Game.convertWorldToCanvas(this.bottomPoint);
+    this.bottomVector = new Vector(Game.canvasCenter.x * 2, this.groundLevel);
+    Game.convertWorldToCanvas(this.bottomVector);
   }
   
   
   void add(Vector lightPosition) {
 //    Vector newLight = new Vector.copy(point);
     this.lights.add(lightPosition);
+    
+    if (this.lights.length == 1) {
+      this.canvasSun = new Vector.copy(this.lights[0]);
+      Game.convertWorldToCanvas(this.canvasSun);
+    }
 //    return newLight;
   }
   
@@ -49,12 +67,15 @@ class LightEngine {
 //    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.canvas.width = this.canvas.width;
+    if (!Debug.showShadows) {
+      return;
+    }
+
+    
     this.secondCanvasTmp.width = this.secondCanvasTmp.width;
     
-    Vector bottomPoint = new Vector(0, this.groundLevel);
-    Vector bottomVector = new Vector(Game.canvasCenter.x * 2, this.groundLevel);
     
-    Vector sun = new Vector.copy(this.lights[0]);
+//    Vector sun = new Vector.copy(this.lights[0]);
     // let's use just canvas coordinates
     //sun.mulLocal(Game.VIEWPORT_SCALE);
     
@@ -62,19 +83,10 @@ class LightEngine {
     
 //    print(objects.length);
     
-    Vector canvasSun = new Vector.copy(sun);
-    Game.convertWorldToCanvas(canvasSun);
     
-    for (GameObject box in objects) {
+    for (var box in objects) {
       List<Vector> verticies;
-      if (box is BasicBoxObject) {
-        verticies = box.getRotatedVerticies();
-      } else if (box is Circle) {
-        verticies = box.getRotatedVerticies(sun);
-//        continue;
-      } else {
-        continue;
-      }
+      verticies = box.getRotatedVerticies(this.lights[0]);
       
       this.canvasTmp.width = this.canvasTmp.width;
       
@@ -93,10 +105,10 @@ class LightEngine {
       for (int i=0; i < verticies.length; i++) {
         Vector intersect = new Vector();
         Vector vertex = verticies[i];
-        this._isIntersecting(sun, vertex, bottomPoint, bottomVector, intersect);
+        this._isIntersecting(canvasSun, vertex, this.bottomPoint, this.bottomVector, intersect);
 //        Vector nv = new Vector.copy(intersect);
         
-        Game.convertWorldToCanvas(intersect);
+//        Game.convertWorldToCanvas(intersect);
         intersections.add(intersect);
         
         if (intersect.x < minX) {
@@ -112,15 +124,15 @@ class LightEngine {
 //          print("${minX.toInt()} ${maxX.toInt()}: ${intersect.x.toInt()}");
 //        }
         
-        Game.convertWorldToCanvas(vertex);
+//        Game.convertWorldToCanvas(vertex);
         
-        if (Game.debug) {
-          this.secondTmpCtx.strokeStyle = '#000';
-          this.secondTmpCtx.beginPath();
-          this.secondTmpCtx.moveTo(canvasSun.x, canvasSun.y);
-          this.secondTmpCtx.lineTo(intersect.x, intersect.y);
-          this.secondTmpCtx.stroke();
-          this.secondTmpCtx.closePath();
+        if (Debug.isEnabled()) {
+          this.mainCtx.strokeStyle = '#000';
+          this.mainCtx.beginPath();
+          this.mainCtx.moveTo(canvasSun.x, canvasSun.y);
+          this.mainCtx.lineTo(intersect.x, intersect.y);
+          this.mainCtx.stroke();
+          this.mainCtx.closePath();
         }
 
       }
@@ -141,26 +153,27 @@ class LightEngine {
 //      intersections.removeAt(2);
 //      print(strippedIntersections);
       
-      if (Game.debug) {
-        this.secondTmpCtx.strokeStyle = '#f00';
-        this.secondTmpCtx.beginPath();
-        this.secondTmpCtx.moveTo(canvasSun.x, canvasSun.y);
-        this.secondTmpCtx.lineTo(intersections[minVertexIndex].x, intersections[minVertexIndex].y);
-        this.secondTmpCtx.stroke();
-        this.secondTmpCtx.moveTo(canvasSun.x, canvasSun.y);
-        this.secondTmpCtx.lineTo(intersections[maxVertexIndex].x, intersections[maxVertexIndex].y);
-        this.secondTmpCtx.stroke();
-        this.secondTmpCtx.closePath();
+      if (Debug.isEnabled()) {
+        this.mainCtx.strokeStyle = '#f00';
+        this.mainCtx.beginPath();
+        this.mainCtx.moveTo(canvasSun.x, canvasSun.y);
+        this.mainCtx.lineTo(intersections[minVertexIndex].x, intersections[minVertexIndex].y);
+        this.mainCtx.stroke();
+        this.mainCtx.moveTo(canvasSun.x, canvasSun.y);
+        this.mainCtx.lineTo(intersections[maxVertexIndex].x, intersections[maxVertexIndex].y);
+        this.mainCtx.stroke();
+        this.mainCtx.closePath();
       }
 
       
-      if (Game.debug) {
+      if (Debug.isEnabled()) {
 //      this.secondTmpCtx.globalAlpha = 1;
         for (int i=0; i < verticies.length; i++) {
-          this.secondTmpCtx.fillStyle = '#00f';
-          this.secondTmpCtx.font = '12px courier';
-          this.secondTmpCtx.textBaseline = 'bottom';
-          this.secondTmpCtx.fillText(i.toString(), verticies[i].x, verticies[i].y);
+          this.mainCtx.globalAlpha = 1;
+          this.mainCtx.fillStyle = '#00f';
+          this.mainCtx.font = '14px courier';
+          this.mainCtx.textBaseline = 'bottom';
+          this.mainCtx.fillText(i.toString(), verticies[i].x, verticies[i].y);
         }
       }
       
@@ -175,25 +188,26 @@ class LightEngine {
       // draw shadow
       this.tmpCtx.strokeStyle = '#000';
       this.tmpCtx.beginPath();
-      this.tmpCtx.moveTo(intersections[minVertexIndex].x, intersections[minVertexIndex].y);
-      this.tmpCtx.lineTo(verticies[minVertexIndex].x, verticies[minVertexIndex].y);
-      this.tmpCtx.lineTo(verticies[maxVertexIndex].x, verticies[maxVertexIndex].y);
-      this.tmpCtx.lineTo(intersections[maxVertexIndex].x, intersections[maxVertexIndex].y);
+      this.tmpCtx.moveTo(intersections[minVertexIndex].x / 2, intersections[minVertexIndex].y / 2);
+      this.tmpCtx.lineTo(verticies[minVertexIndex].x / 2, verticies[minVertexIndex].y / 2);
+      this.tmpCtx.lineTo(verticies[maxVertexIndex].x / 2, verticies[maxVertexIndex].y / 2);
+      this.tmpCtx.lineTo(intersections[maxVertexIndex].x / 2, intersections[maxVertexIndex].y / 2);
       this.tmpCtx.fill();
       this.tmpCtx.closePath();
-      
 
 //      this.tmpCtx.beginPath();
-      
+    
       double pos1x = (box.body.position.x) * Game.VIEWPORT_SCALE + Game.canvasCenter.x;
       double pos1y = -(box.body.position.y) * Game.VIEWPORT_SCALE + Game.canvasCenter.y;
+      pos1x *= 0.5;
+      pos1y *= 0.5;
             
       if (box is BasicBoxObject) {
         // remove box from canvas
         this.tmpCtx.save();
         this.tmpCtx.translate(pos1x, pos1y);
         this.tmpCtx.rotate(box.getCurrentAngle());
-        this.tmpCtx.clearRect(-box.width / 2, -box.height / 2, box.width, box.height);
+        this.tmpCtx.clearRect(-box.width / 4, -box.height / 4, box.width / 2, box.height / 2);
         this.tmpCtx.restore();
       } else if (box is Circle) {
         this.tmpCtx.globalCompositeOperation = 'destination-out';
@@ -202,7 +216,7 @@ class LightEngine {
         this.tmpCtx.beginPath();
         this.tmpCtx.translate(pos1x, pos1y);
         this.tmpCtx.fillStyle = "#f00";
-        this.tmpCtx.arc(0, 0, box.shape.radius * Game.VIEWPORT_SCALE, 0, Math.PI*2, true); 
+        this.tmpCtx.arc(0, 0, box.shape.radius * Game.VIEWPORT_SCALE / 2, 0, Math.PI * 2, true); 
         this.tmpCtx.closePath();
         this.tmpCtx.fill();
         this.tmpCtx.restore();
@@ -271,13 +285,13 @@ class LightEngine {
 //    return (r >= 0 && r <= 1) && (s >= 0 && s <= 1);
 //  }
   
-  int _pointsSortMethodX(Vector a, Vector b) {
-    return (a.x > b.x) ? 1 : 0;
-  }
-
-  int _pointsSortMethodY(Vector a, Vector b) {
-    return (a.y > b.y) ? 1 : 0;
-  }
+//  int _pointsSortMethodX(Vector a, Vector b) {
+//    return (a.x > b.x) ? 1 : 0;
+//  }
+//
+//  int _pointsSortMethodY(Vector a, Vector b) {
+//    return (a.y > b.y) ? 1 : 0;
+//  }
 
   
 }

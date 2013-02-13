@@ -3,13 +3,8 @@ part of droidtowers;
 
 class Levels {
 
-  static Map getLevel(int level) {
-    List levels = _getLevels();
-    return levels[level];
-  }
-  
-  static List _getLevels() {
-    return [
+  static List _levelDefinitions = 
+    [
       {
         "id": 0,
         "boxes": [
@@ -46,7 +41,7 @@ class Levels {
         },
         "sun_x": -25.0
       },
-      
+   
       {
         "id": 1,
         "boxes": [
@@ -81,29 +76,23 @@ class Levels {
         },
         "sun_x": -20.0
       },
-      
+   
       {
         "id": 2,
         "boxes": [
           // x, y, w, h, angl, restitution, density, tex
-//          [-40.0, 10.0, 3.0, 3.0,  0.0, 0.1, 1.0, "crate2.jpg"],
           [-35.0, 12.0, 3.0, 3.0,  0.0, 0.1, 1.0, "crate2.jpg"],
           [ 0.0, 10.0, 3.0, 3.0, 0.0, 0.1, 1.0, "crate2.jpg"],
           [ 0.0, 10.0, 3.0, 3.0, 0.0, 0.1, 1.0, "crate2.jpg"],
-//          [-30.0, 6.0, 3.0, 3.0,  0.0, 0.1, 1.0, "crate2.jpg"],
           [-10.0, 10.0, 3.0, 3.0,  0.5, 0.1, 1.0, "crate2.jpg"],
-//          [ 0.0, 10.0, 5.0, 5.0,  0.0, 0.1, 1.0, "crate.png"],
           [ -20.0, -20.0, 8.0, 4.0, 90.0, 0.1, 1.0, "box2.jpg"],
           [ -17.0, 4.0, 8.0, 4.0, 90.0, 0.1, 1.0, "box2.jpg"],
           [ -23.0, 10.0, 8.0, 4.0, 90.0, 0.1, 1.0, "box2.jpg"],
-//          [ 30.0,-25.0, 8.0, 4.0, 90.0, 0.1, 1.0, "box2.jpg"],
-//          [  3.0,  15.0, 10.0, 2.0,  0.0, 0.1, 1.0, "steel.jpg"],
           [ -40.0, -20.0, 10.0, 1.0,  0.0, 0.1, 1.0, "log2.jpg"],
           [ 35.0,  6.0, 6.0, 3.0,  0.0, 0.1, 1.0, "stone2.jpg"],
           [ 30.0, 10.0, 6.0, 3.0, 40.0, 0.1, 1.0, "stone2.jpg"],
           [ 35.0,  0.0, 6.0, 3.0,  0.0, 0.1, 1.0, "stone2.jpg"],
           [ 27.0, -5.0, 6.0, 3.0,100.0, 0.1, 1.0, "stone2.jpg"],
-
         ],
         "grounds": [
           // x, y, w, h, angl
@@ -127,7 +116,11 @@ class Levels {
         "sun_x": 10.0
       }
     ];
-
+  
+  static Map getLevel(int level) {
+//    List levels = _getLevels();
+    return _levelDefinitions[level];
   }
+
   
 }

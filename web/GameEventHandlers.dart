@@ -12,7 +12,7 @@ class GameEventHandlers {
   
   void onMouseDown(MouseEvent e) {
 //      Vector pointClicked = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
-    Vector pointClicked = Game.convertCanvasToWorld(new Vector(e.clientX, e.clientY));
+    Vector pointClicked = Game.convertCanvasToWorld(new Vector(e.clientX - Game.canvasOffset.x, e.clientY - Game.canvasOffset.y));
     this.dragHandler.deactivate();
     
     for (GameObject o in game.dynamicObjects) {
@@ -47,7 +47,7 @@ class GameEventHandlers {
       o.hovered = false;
     }
     ClickedFixture callback = new ClickedFixture();
-    Vector mousePos = Game.convertCanvasToWorld(new Vector(e.clientX, e.clientY));
+    Vector mousePos = Game.convertCanvasToWorld(new Vector(e.clientX - Game.canvasOffset.x, e.clientY - Game.canvasOffset.y));
 //      callback.mousePos = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
     callback.mousePos = mousePos;
     

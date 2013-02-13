@@ -13,6 +13,8 @@ class DynamicBox extends BasicBoxObject {
   
   bool highlight = false;
   
+  List<Vector> previousRotatedVerticies;
+  
   DynamicBox(Vector size, Vector position, double restitution, double density, [double angle = 0.0, double friction = 1.0]): super() {
     
     this.shape = new PolygonShape();
@@ -76,19 +78,42 @@ class DynamicBox extends BasicBoxObject {
 
   }
   
+  List<Vector> getRotatedVerticies([Vector lightSource]) {
+//    print(this.body.linearVelocity.length);
+    if (this.body.linearVelocity.length < 0.01) {
+//      print('cached getRotatedVerticies');
+      return this.previousRotatedVerticies;
+    } else {
+//    if (this.previousRotatedVerticies && )
+//      print('recalculate getRotatedVerticies');
+      List<Vector> boundary = super.getRotatedVerticies();
+//      boundary[0].mulLocal(0.5);
+//      boundary[1].mulLocal(0.5);
+//      boundary[2].mulLocal(0.5);
+//      boundary[3].mulLocal(0.5);
+      Game.convertWorldToCanvas(boundary[0]);
+      Game.convertWorldToCanvas(boundary[1]);
+      Game.convertWorldToCanvas(boundary[2]);
+      Game.convertWorldToCanvas(boundary[3]);
+      
+      this.previousRotatedVerticies = boundary;
+      return boundary;
+    }
+  }
+  
   void _drawStroke(CanvasRenderingContext2D ctx, String color, [int lineWidth]) {
     if (!?lineWidth) {
       lineWidth = 1;
     }
-    List<Vector> boundary = this.getRotatedVerticies();
+    List<Vector> boundary = this.getRotatedVerticies(null);
     ctx.beginPath();
     ctx.strokeStyle = color;
     ctx.lineWidth = lineWidth;
     for (int i=0; i < boundary.length; i++) {
       if (i == 0) {
-        ctx.moveTo(boundary[i].x * Game.VIEWPORT_SCALE + Game.canvasCenter.x, -boundary[i].y * Game.VIEWPORT_SCALE + Game.canvasCenter.y);
+        ctx.moveTo(boundary[i].x, boundary[i].y);
       } else {
-        ctx.lineTo(boundary[i].x * Game.VIEWPORT_SCALE + Game.canvasCenter.x, -boundary[i].y * Game.VIEWPORT_SCALE + Game.canvasCenter.y);
+        ctx.lineTo(boundary[i].x, boundary[i].y);
       }
     }
     ctx.closePath();

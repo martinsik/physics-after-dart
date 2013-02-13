@@ -7,6 +7,7 @@ part of droidtowers;
 class StaticBox extends BasicBoxObject {
   
   PolygonShape shape;
+  List<Vector> _rotatedVerticies;
   
   StaticBox(Vector size, Vector position, [double angle]): super() {
     if (!?angle) {
@@ -26,14 +27,26 @@ class StaticBox extends BasicBoxObject {
     this.width = 2 * size.x * Game.VIEWPORT_SCALE;
     this.height = 2 * size.y * Game.VIEWPORT_SCALE;
     this.origAngle = angle * Game.DEGRE_TO_RADIAN;
-
   }
   
   void addObjectToWorld(World world) {
     this.body = world.createBody(this.bodyDef);
     this.body.createFixtureFromShape(this.shape);
+    // cache rotated verticies, because this wont change
+    this._rotatedVerticies = super.getRotatedVerticies();
+    
+    Game.convertWorldToCanvas(this._rotatedVerticies[0]);
+    Game.convertWorldToCanvas(this._rotatedVerticies[1]);
+    Game.convertWorldToCanvas(this._rotatedVerticies[2]);
+    Game.convertWorldToCanvas(this._rotatedVerticies[3]);
+
+    
   }
 
+  List<Vector> getRotatedVerticies([Vector lightSource]) {
+    return this._rotatedVerticies;
+  }
+  
   void draw(CanvasRenderingContext2D ctx) {
     
 //    ctx.save();
@@ -61,16 +74,16 @@ class StaticBox extends BasicBoxObject {
 //    
 //    ctx.restore();
 
-    List<Vector> verticies = this.getRotatedVerticies();
-    Game.convertWorldToCanvas(verticies[0]);
-    Game.convertWorldToCanvas(verticies[1]);
-    Game.convertWorldToCanvas(verticies[2]);
-    Game.convertWorldToCanvas(verticies[3]);
+//    List<Vector> verticies = this.getRotatedVerticies();
+//    Game.convertWorldToCanvas(verticies[0]);
+//    Game.convertWorldToCanvas(verticies[1]);
+//    Game.convertWorldToCanvas(verticies[2]);
+//    Game.convertWorldToCanvas(verticies[3]);
     
-    ctx.moveTo(verticies[0].x, verticies[0].y);
-    ctx.lineTo(verticies[1].x, verticies[1].y);
-    ctx.lineTo(verticies[2].x, verticies[2].y);
-    ctx.lineTo(verticies[3].x, verticies[3].y);
+    ctx.moveTo(this._rotatedVerticies[0].x, this._rotatedVerticies[0].y);
+    ctx.lineTo(this._rotatedVerticies[1].x, this._rotatedVerticies[1].y);
+    ctx.lineTo(this._rotatedVerticies[2].x, this._rotatedVerticies[2].y);
+    ctx.lineTo(this._rotatedVerticies[3].x, this._rotatedVerticies[3].y);
 
 //    this.shape.vertices.
     
