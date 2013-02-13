@@ -9,8 +9,10 @@ It's a simple puzzle game based of physics. I managed to make only 3 levels duri
 
 For best experience I recommend using Chrome or Chronium with native support for Dart. It works on Firefox as well, just framerate won't as good as in Chrome.
 
-![Screenshot #1](https://raw.github.com/martinsik/physics-after-dart/master/screenshots/small1.jpg),![Screenshot #1](https://raw.github.com/martinsik/physics-after-dart/master/screenshots/small2.jpg)
-![Screenshot #1](https://raw.github.com/martinsik/physics-after-dart/master/screenshots/small3.jpg),![Screenshot #1](https://raw.github.com/martinsik/physics-after-dart/master/screenshots/small4.jpg)
+![Screenshot #1](https://raw.github.com/martinsik/physics-after-dart/master/screenshots/small1.jpg)
+![Screenshot #2](https://raw.github.com/martinsik/physics-after-dart/master/screenshots/small2.jpg)
+![Screenshot #3](https://raw.github.com/martinsik/physics-after-dart/master/screenshots/small3.jpg)
+![Screenshot #4](https://raw.github.com/martinsik/physics-after-dart/master/screenshots/small4.jpg)
 
 Known issues
 ------------
