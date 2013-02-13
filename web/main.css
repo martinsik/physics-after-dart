@@ -4,6 +4,7 @@
   padding: 0;
   font-family: Rationale;
   text-transform: uppercase;
+  line-height: 100%;
 }
 
 body {
@@ -68,8 +69,7 @@ div#levels_label,
 div#level_progess,
 div#start_critters {
   font-size: 28px;
-  height: 30px;
-  padding: 5px;
+  padding: 5px 5px 3px 5px;
   z-index: 200;
   text-align: center;
   top: 20px;
