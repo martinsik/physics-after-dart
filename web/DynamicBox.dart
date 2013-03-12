@@ -3,7 +3,7 @@
 //import 'GameObject.dart';
 //import 'dart:math' as Math;
 
-part of droidtowers;
+part of physics_after_dart;
 
 class DynamicBox extends BasicBoxObject {
   
@@ -13,12 +13,12 @@ class DynamicBox extends BasicBoxObject {
   
   bool highlight = false;
   
-  List<Vector> previousRotatedVerticies;
+  List<vec2> previousRotatedVerticies;
   
-  DynamicBox(Vector size, Vector position, double restitution, double density, [double angle = 0.0, double friction = 1.0]): super() {
+  DynamicBox(vec2 size, vec2 position, double restitution, double density, [double angle = 0.0, double friction = 1.0]): super() {
     
     this.shape = new PolygonShape();
-    this.shape.setAsBoxWithCenterAndAngle(size.x, size.y, new Vector(0, 0), angle * Game.DEGRE_TO_RADIAN);
+    this.shape.setAsBoxWithCenterAndAngle(size.x, size.y, new vec2(0, 0), angle * Game.DEGRE_TO_RADIAN);
     
     this.activeFixtureDef = new FixtureDef();
     this.activeFixtureDef.restitution = restitution;
@@ -78,7 +78,7 @@ class DynamicBox extends BasicBoxObject {
 
   }
   
-  List<Vector> getRotatedVerticies([Vector lightSource]) {
+  List<vec2> getRotatedVerticies([vec2 lightSource]) {
 //    print(this.body.linearVelocity.length);
     if (this.body.linearVelocity.length < 0.01) {
 //      print('cached getRotatedVerticies');
@@ -86,7 +86,7 @@ class DynamicBox extends BasicBoxObject {
     } else {
 //    if (this.previousRotatedVerticies && )
 //      print('recalculate getRotatedVerticies');
-      List<Vector> boundary = super.getRotatedVerticies();
+      List<vec2> boundary = super.getRotatedVerticies();
 //      boundary[0].mulLocal(0.5);
 //      boundary[1].mulLocal(0.5);
 //      boundary[2].mulLocal(0.5);
@@ -105,7 +105,7 @@ class DynamicBox extends BasicBoxObject {
     if (!?lineWidth) {
       lineWidth = 1;
     }
-    List<Vector> boundary = this.getRotatedVerticies(null);
+    List<vec2> boundary = this.getRotatedVerticies(null);
     ctx.beginPath();
     ctx.strokeStyle = color;
     ctx.lineWidth = lineWidth;

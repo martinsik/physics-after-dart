@@ -1,15 +1,15 @@
 
-part of droidtowers;
+part of physics_after_dart;
 
 class DragHandler {
   
-  Vector _destionationPos;
+  vec2 _destionationPos;
   
-  Vector relativeDistanceFromObjectCenter;
+  vec2 relativeDistanceFromObjectCenter;
   
   DynamicBox _activeObject;
   
-  Vector _mousePosStart;
+  vec2 _mousePosStart;
     
   bool _active = false;
   
@@ -17,7 +17,7 @@ class DragHandler {
   bool rotateRight = false;
   bool rotateToDefault = false;
   
-  void activate(Vector mousePosStart, DynamicBox obj) {
+  void activate(vec2 mousePosStart, DynamicBox obj) {
     this._active = true;
 //    if (?obj) {
     this._activeObject = obj;
@@ -42,32 +42,32 @@ class DragHandler {
     }
   }
   
-  void setStartPos(Vector newStartPos) {
+  void setStartPos(vec2 newStartPos) {
     this._mousePosStart = newStartPos;
   }
   
-  void setDestination(Vector point) {
+  void setDestination(vec2 point) {
     this._destionationPos = point;
   }
   
-  Vector getCorrectedDestination() {
-    return new Vector(this._destionationPos.x - this.relativeDistanceFromObjectCenter.x,
+  vec2 getCorrectedDestination() {
+    return new vec2(this._destionationPos.x - this.relativeDistanceFromObjectCenter.x,
                       this._destionationPos.y - this.relativeDistanceFromObjectCenter.y);
   }
   
-  double distanceFromStart(Vector point) {
-    return this._mousePosStart.distanceBetween(point);
+  double distanceFromStart(vec2 point) {
+    return distance(this._mousePosStart, point);
   }
   
-  double distanceFromStartAndUpdate(Vector point) {
-    double dist = this._mousePosStart.distanceBetween(point);
+  double distanceFromStartAndUpdate(vec2 point) {
+    double dist = distance(this._mousePosStart, point);
     this.setStartPos(point);
     return dist;
   }
     
   double objectDistanceToDestination() {
     if (this.isActive()) {
-      return this._activeObject.body.position.distanceBetween(this._destionationPos);
+      return distance(this._activeObject.body.position, this._destionationPos);
     } else {
       return 0.0;
     } 

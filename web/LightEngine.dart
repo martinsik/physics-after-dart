@@ -1,5 +1,5 @@
 
-part of droidtowers;
+part of physics_after_dart;
 
 class LightEngine {
   
@@ -12,17 +12,17 @@ class LightEngine {
   CanvasElement secondCanvasTmp;
   double groundLevel;
   
-  List<Vector> lights;
+  List<vec2> lights;
   
-  Vector bottomPoint;
-  Vector bottomVector;
-  Vector canvasSun;
+  vec2 bottomPoint;
+  vec2 bottomVector;
+  vec2 canvasSun;
   
   
 //  LightEngine(Vector pos) : this.position = pos;
   
   LightEngine(CanvasElement elm, CanvasRenderingContext2D mainCtx, double groundLevel) {
-    this.lights = new List<Vector>();
+    this.lights = new List<vec2>();
     this.canvas = elm;
     this.groundLevel = groundLevel;
     this.canvasTmp = new Element.tag('canvas');
@@ -38,19 +38,19 @@ class LightEngine {
     this.secondTmpCtx = this.secondCanvasTmp.getContext("2d");
     this.mainCtx = mainCtx;
     
-    this.bottomPoint = new Vector(0, this.groundLevel);
+    this.bottomPoint = new vec2(0, this.groundLevel);
     Game.convertWorldToCanvas(this.bottomPoint);
-    this.bottomVector = new Vector(Game.canvasCenter.x * 2, this.groundLevel);
+    this.bottomVector = new vec2(Game.canvasCenter.x * 2, this.groundLevel);
     Game.convertWorldToCanvas(this.bottomVector);
   }
   
   
-  void add(Vector lightPosition) {
+  void add(vec2 lightPosition) {
 //    Vector newLight = new Vector.copy(point);
     this.lights.add(lightPosition);
     
     if (this.lights.length == 1) {
-      this.canvasSun = new Vector.copy(this.lights[0]);
+      this.canvasSun = new vec2.copy(this.lights[0]);
       Game.convertWorldToCanvas(this.canvasSun);
     }
 //    return newLight;
@@ -85,7 +85,7 @@ class LightEngine {
     
     
     for (var box in objects) {
-      List<Vector> verticies;
+      List<vec2> verticies;
       verticies = box.getRotatedVerticies(this.lights[0]);
       
       this.canvasTmp.width = this.canvasTmp.width;
@@ -94,7 +94,7 @@ class LightEngine {
       
 //      Vector intersect = new Vector();
 
-      List<Vector> intersections = new List<Vector>();
+      List<vec2> intersections = new List<vec2>();
       
       double minX = double.MAX_FINITE;
       double maxX = -double.MAX_FINITE;
@@ -103,8 +103,8 @@ class LightEngine {
             
 //      for (Vector vertex in verticies) {
       for (int i=0; i < verticies.length; i++) {
-        Vector intersect = new Vector();
-        Vector vertex = verticies[i];
+        vec2 intersect = new vec2();
+        vec2 vertex = verticies[i];
         this._isIntersecting(canvasSun, vertex, this.bottomPoint, this.bottomVector, intersect);
 //        Vector nv = new Vector.copy(intersect);
         
@@ -154,6 +154,7 @@ class LightEngine {
 //      print(strippedIntersections);
       
       if (Debug.isEnabled()) {
+        this.mainCtx.globalAlpha = 0.35;
         this.mainCtx.strokeStyle = '#f00';
         this.mainCtx.beginPath();
         this.mainCtx.moveTo(canvasSun.x, canvasSun.y);
@@ -163,6 +164,7 @@ class LightEngine {
         this.mainCtx.lineTo(intersections[maxVertexIndex].x, intersections[maxVertexIndex].y);
         this.mainCtx.stroke();
         this.mainCtx.closePath();
+        this.mainCtx.globalAlpha = 1;
       }
 
       
@@ -251,7 +253,7 @@ class LightEngine {
     
   }
   
-  bool _isIntersecting(Vector p1, Vector p2, Vector p3, Vector p4, Vector out)
+  bool _isIntersecting(vec2 p1, vec2 p2, vec2 p3, vec2 p4, vec2 out)
   {
     double denominator = ((p1.x - p2.x) * (p3.y - p4.y)) - ((p1.y - p2.y) * (p3.x - p4.x));
     double numerator1 = (p1.x * p2.y - p1.y * p2.x) * (p3.x - p4.x) - ((p1.x - p2.x) * (p3.x * p4.y - p3.y * p4.x));

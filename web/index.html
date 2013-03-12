@@ -23,6 +23,8 @@
         <div id="debug_shadows_button"></div>
       </div>
       
+      <a id="fork_on_github" href="https://github.com/martinsik/physics-after-dart" target="_blank">fork me on github.com</a>
+
       <div id="levels_label">levels:&nbsp;</div>
       <div id="level1" class="level">1</div>
       <div id="level2" class="level">2</div>
@@ -44,5 +46,15 @@
 
     <script type="application/dart" src="./Game.dart"></script>
     <script src="packages/browser/dart.js"></script>
+
+    <script>
+    // google analytics async snippet
+    var g=document.createElement('script'),
+        s=document.getElementsByTagName('script')[0];
+    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+    s.parentNode.insertBefore(g,s);
+
+    var _gaq=[['_setAccount','UA-17997066-1'],['_trackPageview']];
+    </script>
   </body>
 </html>

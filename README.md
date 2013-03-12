@@ -28,7 +28,7 @@ About
 When I saw [indie game Thomas Was Alone] [3] I absolutely loved how each object casts shadow. It's such a simple effect but it enhances the entire game experience so much so I wanted to make something similar.  
 Well, I did although the algorhitm I'm using right now isn't very efficient. It's based on three canvases that has to be copied on the top of each other (there are some limitation by the canvas element itself). I belive that this part can be improved significantly. I'll try to explain how the shadow casting work on my blog soon.
 
-I want to keep this game open source and maybe turn it into a Chrome App. Also, I was thinking about making a standalone PC/Mac/Linux game based on this project because still Dart isn't as efficient as a standalone game and it's actuallu limited only to Chtome uses. But I'll see :), don't want to promise anything right now.
+I want to keep this repo as an open source "game engine" and build on top of it standalone game that I'll publish on Chrome App (probably for money).
 
 I called this game "PhysicsAfterDark" first but I think this name is more stylish :).
 

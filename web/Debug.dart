@@ -1,5 +1,5 @@
 
-part of droidtowers;
+part of physics_after_dart;
 
 class Debug {
 
@@ -30,8 +30,8 @@ class Debug {
   Stopwatch shadowsStopwatch;
   Stopwatch endSolverStopwatch;
   
-  var updateInterval;
-  var fpsInterval;
+  Future updateInterval;
+  Future fpsInterval;
   
   Debug() {
     this.debugElm = query("#debug");
@@ -55,6 +55,8 @@ class Debug {
       this._updateWindow();
     });
 
+    this._updateWindow();
+    this._updateFPSCounter();
   }
   
   void showDebugWindow() {
@@ -66,15 +68,21 @@ class Debug {
     
     Debug._showWindow = true;
     
-    this.updateInterval = window.setInterval(() {
-      this.lastSecondframeCount = thisSecondframeCount;
-      this.thisSecondframeCount = 0;
-    }, 1000);
+    // var future = new Future.delayed(const Duration(milliseconds: 10), doStuffCallback);
+//    this.updateInterval = new Future.delayed(const Duration(seconds: 1), () {
+//      this.lastSecondframeCount = thisSecondframeCount;
+//      this.thisSecondframeCount = 0;
+//    });
     
-    this.fpsInterval = window.setInterval(() {
-      this._updateWindow();
-    }, 200);
+    // this.fpsInterval = window.setInterval(() {
+//    this.fpsInterval = new Future.delayed(const Duration(milliseconds: 200), () {
+//      this._updateWindow();
+//      this.fpsInterval.
+//    });
 
+    // @TODO: Fix, stop timers with newer Dart SDK
+    // this._updateWindow();
+    
     this.debugElm.style.display = "block";
   }
 
@@ -87,8 +95,8 @@ class Debug {
     
     Debug._showWindow = false;
     this.debugElm.style.display = "none";
-    window.clearInterval(this.updateInterval);
-    window.clearInterval(this.fpsInterval);
+//    window.clearInterval(this.updateInterval);
+//    window.clearInterval(this.fpsInterval);
   }
   
   static bool isEnabled() {
@@ -108,6 +116,16 @@ class Debug {
     
     this.debugTexturesButtonElm.text = "textures: ${Debug.showTextures ? 'on' : 'off'}";
     this.debugShadowsButtonElm.text = "shadows: ${Debug.showShadows ? 'on' : 'off'}";
+    
+//    this.updateInterval = new Future.delayed(const Duration(seconds: 1), () {
+    this.fpsInterval = new Future.delayed(const Duration(milliseconds: 200), this._updateWindow);
+  }
+    
+  void _updateFPSCounter() {
+    this.lastSecondframeCount = thisSecondframeCount;
+    this.thisSecondframeCount = 0;
+    
+    this.updateInterval = new Future.delayed(const Duration(seconds: 1), this._updateFPSCounter);
   }
 }
 

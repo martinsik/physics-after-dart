@@ -1,6 +1,7 @@
-name: tower
+name: physics_after_dart
+version: 0.1.0
 author: Martin Sikora
-description: A sample web application
+homepage: http://martinsikora.com
 dependencies:
   box2d: any
   browser: any

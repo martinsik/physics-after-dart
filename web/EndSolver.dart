@@ -1,14 +1,14 @@
 
-part of droidtowers;
+part of physics_after_dart;
 
 class EndSolver {
   
-  List<Vector> endPoints;
+  List<vec2> endPoints;
   List<Critter> critters;
-  Vector spawnPoint;
+  vec2 spawnPoint;
   Game game;
   
-  EndSolver(List<Vector> endPoints, Vector spawnPoint, List<Critter> critters, Game game):
+  EndSolver(List<vec2> endPoints, vec2 spawnPoint, List<Critter> critters, Game game):
     this.endPoints = endPoints,
     this.game = game,
     this.spawnPoint = spawnPoint,
@@ -63,12 +63,12 @@ class EndSolver {
   }
   
   
-  double _sign(Vector p1, Vector p2, Vector p3)
+  double _sign(vec2 p1, vec2 p2, vec2 p3)
   {
     return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
   }
 
-  bool _pointInTriangle(Vector pt, Vector v1, Vector v2, Vector v3)
+  bool _pointInTriangle(vec2 pt, vec2 v1, vec2 v2, vec2 v3)
   {
     bool b1, b2, b3;
 

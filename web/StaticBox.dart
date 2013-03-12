@@ -2,20 +2,20 @@
 //import 'package:box2d/box2d.dart';
 //import 'GameObject.dart';
 
-part of droidtowers;
+part of physics_after_dart;
 
 class StaticBox extends BasicBoxObject {
   
   PolygonShape shape;
-  List<Vector> _rotatedVerticies;
+  List<vec2> _rotatedVerticies;
   
-  StaticBox(Vector size, Vector position, [double angle]): super() {
+  StaticBox(vec2 size, vec2 position, [double angle]): super() {
     if (!?angle) {
       angle = 0.0;
     }
     
     this.shape = new PolygonShape();
-    this.shape.setAsBoxWithCenterAndAngle(size.x, size.y, new Vector(0, 0), angle * Game.DEGRE_TO_RADIAN);
+    this.shape.setAsBoxWithCenterAndAngle(size.x, size.y, new vec2(0, 0), angle * Game.DEGRE_TO_RADIAN);
     
 //    this.activeFixtureDef = new FixtureDef();
 //    this.activeFixtureDef.shape = this.shape;
@@ -43,7 +43,7 @@ class StaticBox extends BasicBoxObject {
     
   }
 
-  List<Vector> getRotatedVerticies([Vector lightSource]) {
+  List<vec2> getRotatedVerticies([vec2 lightSource]) {
     return this._rotatedVerticies;
   }
   

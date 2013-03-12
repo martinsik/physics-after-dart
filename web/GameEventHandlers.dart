@@ -1,5 +1,5 @@
 
-part of droidtowers;
+part of physics_after_dart;
 
 class GameEventHandlers {
   
@@ -12,7 +12,7 @@ class GameEventHandlers {
   
   void onMouseDown(MouseEvent e) {
 //      Vector pointClicked = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
-    Vector pointClicked = Game.convertCanvasToWorld(new Vector(e.clientX - Game.canvasOffset.x, e.clientY - Game.canvasOffset.y));
+    vec2 pointClicked = Game.convertCanvasToWorld(new vec2(e.clientX - Game.canvasOffset.x, e.clientY - Game.canvasOffset.y));
     this.dragHandler.deactivate();
     
     for (GameObject o in game.dynamicObjects) {
@@ -26,8 +26,8 @@ class GameEventHandlers {
         this.dragHandler.activate(pointClicked, o);
         this.dragHandler.setDestination(pointClicked);
         
-        Vector diffFromObjectCenter = new Vector.copy(pointClicked);
-        diffFromObjectCenter.subLocal(o.body.position);
+        vec2 diffFromObjectCenter = new vec2.copy(pointClicked);
+        diffFromObjectCenter.sub(o.body.position);
         this.dragHandler.relativeDistanceFromObjectCenter = diffFromObjectCenter;
 //          print("tag: ${o.tag}");
         break;
@@ -47,7 +47,7 @@ class GameEventHandlers {
       o.hovered = false;
     }
     ClickedFixture callback = new ClickedFixture();
-    Vector mousePos = Game.convertCanvasToWorld(new Vector(e.clientX - Game.canvasOffset.x, e.clientY - Game.canvasOffset.y));
+    vec2 mousePos = Game.convertCanvasToWorld(new vec2(e.clientX - Game.canvasOffset.x, e.clientY - Game.canvasOffset.y));
 //      callback.mousePos = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
     callback.mousePos = mousePos;
     

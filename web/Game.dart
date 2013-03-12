@@ -1,8 +1,9 @@
-library droidtowers;
+library physics_after_dart;
 
 import 'dart:html';
 import 'dart:math' as Math;
 import 'dart:json' as json;
+import 'dart:async';
 import 'package:box2d/box2d_browser.dart';
 
 part 'GameObject.dart';
@@ -36,10 +37,10 @@ class Game {
   static const double DEGRE_TO_RADIAN = 0.0174532925;
 
   // view transformation from physics world coordinates to canvas
-  static IViewportTransform viewport;
+  static ViewportTransform viewport;
 
-  static Vector canvasCenter;
-  static Vector canvasOffset;
+  static vec2 canvasCenter;
+  static vec2 canvasOffset;
   
   // All of the bodies in a simulation.
   List<GameObject> grounds;
@@ -81,7 +82,7 @@ class Game {
   
   GameEventHandlers eventHandler;
   
-  Vector sun;
+  vec2 sun;
   
   EndSolver endSolver;
   
@@ -122,7 +123,7 @@ class Game {
     this._initListeners();
 
     // Create the viewport transform with the center at extents.
-    final extents = new Vector(this.canvas.width / 2, this.canvas.height / 2);
+    final extents = new vec2(this.canvas.width / 2, this.canvas.height / 2);
     viewport = new CanvasViewportTransform(extents, extents);
     viewport.scale = VIEWPORT_SCALE;
     
@@ -145,7 +146,7 @@ class Game {
     this.resetUI();
     
     // create physics world
-    Vector gravity = new Vector(0, GRAVITY);
+    vec2 gravity = new vec2(0, GRAVITY);
     this.world = new World(gravity, true, new DefaultWorldPool());
     
     this.running = false;
@@ -163,7 +164,7 @@ class Game {
 
     this.level = Levels.getLevel(level);
     
-    this.sun = new Vector(this.level['sun_x'], Game.canvasCenter.y / Game.VIEWPORT_SCALE);
+    this.sun = new vec2(this.level['sun_x'], Game.canvasCenter.y / Game.VIEWPORT_SCALE);
     this.lightEngine.add(this.sun);
     
     this._createBoxes(this.level['boxes']);
@@ -174,13 +175,13 @@ class Game {
     
     // add start and end triangles
 //    List points = level['start'];
-    List<Vector> endVectorPoints = new List<Vector>();
+    List<vec2> endVectorPoints = new List<vec2>();
     for (List point in this.level['end']) {
-      endVectorPoints.add(new Vector(point[0], point[1]));
+      endVectorPoints.add(new vec2(point[0], point[1]));
     }
 
     this.endSolver = new EndSolver(endVectorPoints,
-        new Vector(this.level['critters']['spawn_point'][0], this.level['critters']['spawn_point'][1]),
+        new vec2(this.level['critters']['spawn_point'][0], this.level['critters']['spawn_point'][1]),
         this.critters, this);
     
     this.randomGenerator = new Math.Random(this.level['critters']['seed']);
@@ -282,25 +283,25 @@ class Game {
   
   void _createGround(double height, List moreGrounds) {
     StaticBox ground;
-    ground = new StaticBox(new Vector(50.0, height / 2), new Vector(0.0, this.groundLevel + height / 2));
+    ground = new StaticBox(new vec2(50.0, height / 2), new vec2(0.0, this.groundLevel + height / 2));
     ground.addObjectToWorld(this.world);
     this.grounds.add(ground);
     
-    ground = new StaticBox(new Vector(50.0, 1.0), new Vector(0.0, Game.canvasCenter.y / Game.VIEWPORT_SCALE));
+    ground = new StaticBox(new vec2(50.0, 1.0), new vec2(0.0, Game.canvasCenter.y / Game.VIEWPORT_SCALE));
     ground.addObjectToWorld(this.world);
     this.grounds.add(ground);
 
-    ground = new StaticBox(new Vector(1.0, (Game.canvasCenter.y * 2) / Game.VIEWPORT_SCALE), new Vector(Game.canvasCenter.x / Game.VIEWPORT_SCALE, 0));
+    ground = new StaticBox(new vec2(1.0, (Game.canvasCenter.y * 2) / Game.VIEWPORT_SCALE), new vec2(Game.canvasCenter.x / Game.VIEWPORT_SCALE, 0));
     ground.addObjectToWorld(this.world);
     this.grounds.add(ground);
 
-    ground = new StaticBox(new Vector(1.0, (Game.canvasCenter.y * 2) / Game.VIEWPORT_SCALE), new Vector(-Game.canvasCenter.x / Game.VIEWPORT_SCALE, 0));
+    ground = new StaticBox(new vec2(1.0, (Game.canvasCenter.y * 2) / Game.VIEWPORT_SCALE), new vec2(-Game.canvasCenter.x / Game.VIEWPORT_SCALE, 0));
     ground.addObjectToWorld(this.world);
     this.grounds.add(ground);
     
     for (List groundDefinition in moreGrounds) { 
-      ground = new StaticBox(new Vector(groundDefinition[2], groundDefinition[3]),
-                             new Vector(groundDefinition[0], groundDefinition[1]),
+      ground = new StaticBox(new vec2(groundDefinition[2], groundDefinition[3]),
+                             new vec2(groundDefinition[0], groundDefinition[1]),
                              groundDefinition[4]);
       ground.addObjectToWorld(this.world);
       this.grounds.add(ground);
@@ -316,8 +317,8 @@ class Game {
       
 //      double test = boxDefinition[4];
       
-      box = new DynamicBox(new Vector(boxDefinition[2], boxDefinition[3]),
-                           new Vector(boxDefinition[0], boxDefinition[1]),
+      box = new DynamicBox(new vec2(boxDefinition[2], boxDefinition[3]),
+                           new vec2(boxDefinition[0], boxDefinition[1]),
                            boxDefinition[5], boxDefinition[6], boxDefinition[4]);
       box.addObjectToWorld(this.world);
       box.setTexture("./images/${boxDefinition[7]}");
@@ -342,8 +343,8 @@ class Game {
     this.wrapperElm.style.width = "${CANVAS_WIDTH}px";
     this.wrapperElm.style.height = "${CANVAS_HEIGHT}px";
     
-    Game.canvasCenter = new Vector(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
-    Game.canvasOffset = new Vector((window.innerWidth - CANVAS_WIDTH) / 2, (window.innerHeight - CANVAS_HEIGHT) / 2);
+    Game.canvasCenter = new vec2(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+    Game.canvasOffset = new vec2((window.innerWidth - CANVAS_WIDTH) / 2, (window.innerHeight - CANVAS_HEIGHT) / 2);
     
     this.wrapperElm.style.top = "${canvasOffset.y}px";
     this.wrapperElm.style.left = "${canvasOffset.x}px";
@@ -354,10 +355,10 @@ class Game {
     this.running = true;
     
     Map crittersSettings = this.level['critters'];
-    Vector spawnPoint = new Vector(crittersSettings['spawn_point'][0], crittersSettings['spawn_point'][1]);
+    vec2 spawnPoint = new vec2(crittersSettings['spawn_point'][0], crittersSettings['spawn_point'][1]);
     
     for (int i=0; i < crittersSettings['count']; i++) {
-      Vector randomPosition = new Vector.copy(spawnPoint);
+      vec2 randomPosition = new vec2.copy(spawnPoint);
       randomPosition.x = randomPosition.x + this.randomGenerator.nextDouble() * CRITTER_SPAWN_RADIUS;
       randomPosition.y = randomPosition.y + this.randomGenerator.nextDouble() * CRITTER_SPAWN_RADIUS;
       
@@ -394,10 +395,10 @@ class Game {
     if (this.eventHandler.dragHandler.isActive()) {
       double dist = this.eventHandler.dragHandler.objectDistanceToDestination();
       GameObject obj = this.eventHandler.dragHandler.getActiveObject(); 
-      Vector diffVector = new Vector.copy(this.eventHandler.dragHandler.getCorrectedDestination());
-      diffVector.subLocal(obj.body.position);
+      vec2 diffVector = new vec2.copy(this.eventHandler.dragHandler.getCorrectedDestination());
+      diffVector.sub(obj.body.position);
       
-      obj.body.linearVelocity = new Vector(diffVector.x * Game.MOVE_VELOCITY, diffVector.y * Game.MOVE_VELOCITY);
+      obj.body.linearVelocity = new vec2(diffVector.x * Game.MOVE_VELOCITY, diffVector.y * Game.MOVE_VELOCITY);
       
       if (this.eventHandler.dragHandler.rotateLeft) {
         obj.body.angularVelocity = 1.5;
@@ -435,7 +436,7 @@ class Game {
     // draw debug rectangles
     if (Debug.showTextures) {
       // draw sun
-      Vector sunPos = new Vector(this.sun.x, this.sun.y);
+      vec2 sunPos = new vec2(this.sun.x, this.sun.y);
       Game.convertWorldToCanvas(sunPos);
       this.ctx.beginPath();
       this.ctx.arc(sunPos.x, 3, 10, 0, 2 * Math.PI, false);
@@ -523,12 +524,12 @@ class Game {
 //    this.ctx.fillText("fps: ${this.canvasFpsCounter}, physics step: ${this.canvasWorldStepTime} ms", 5, 20);
 //  }
   
-  static Vector convertCanvasToWorld(Vector canvasVectorOrPoint) {
-    return new Vector((canvasVectorOrPoint.x - Game.canvasCenter.x) / Game.VIEWPORT_SCALE,
+  static vec2 convertCanvasToWorld(vec2 canvasVectorOrPoint) {
+    return new vec2((canvasVectorOrPoint.x - Game.canvasCenter.x) / Game.VIEWPORT_SCALE,
                       (Game.canvasCenter.y - canvasVectorOrPoint.y) / Game.VIEWPORT_SCALE);
   }
 
-  static void convertWorldToCanvas(Vector worldVectorOrPoint) {
+  static void convertWorldToCanvas(vec2 worldVectorOrPoint) {
     worldVectorOrPoint.x = worldVectorOrPoint.x * Game.VIEWPORT_SCALE + Game.canvasCenter.x;
     worldVectorOrPoint.y = -worldVectorOrPoint.y * Game.VIEWPORT_SCALE + Game.canvasCenter.y;
   }

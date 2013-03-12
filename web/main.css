@@ -7,6 +7,11 @@
   line-height: 100%;
 }
 
+a {
+  text-decoration: none;
+  color: black;
+}
+
 body {
   background-color: black;
   font-family: 'Open Sans', sans-serif;
@@ -60,6 +65,7 @@ div {
   position: absolute;
 }
 
+a#fork_on_github,
 div.button,
 div.level,
 div#debug_timing,
@@ -74,6 +80,7 @@ div#start_critters {
   text-align: center;
   top: 20px;
   background: #F5EA56;
+  position: absolute;
 }
 
 div#debug {
@@ -85,6 +92,7 @@ div#start_critters {
   width: 120px;
 }
 
+a#fork_on_github:hover,
 div#debug_textures_button:hover,
 div#debug_shadows_button:hover,
 div#play_again:hover,
@@ -155,7 +163,6 @@ div#level_progess {
   position: relative;
   margin-left: auto;
   margin-right: auto;
-
 }
 
 #debug {
@@ -178,4 +185,13 @@ div#debug_textures_button {
 }
 div#debug_shadows_button {
   top: 210px;
+}
+
+a#fork_on_github {
+  font-size: 14px;
+  height: 27px;
+  width: 70px;
+  padding-top: 6px;
+  left: 670px;
+  /*top: 70px;*/
 }

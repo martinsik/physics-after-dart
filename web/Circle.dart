@@ -1,5 +1,5 @@
 
-part of droidtowers;
+part of physics_after_dart;
 
 class Circle extends GameObject {
   
@@ -17,20 +17,20 @@ class Circle extends GameObject {
   
   void draw(CanvasRenderingContext2D ctx) { }
   
-  List<Vector> getRotatedVerticies(Vector lightSource) {
+  List<vec2> getRotatedVerticies(vec2 lightSource) {
     
-    Vector tmp = new Vector.copy(lightSource);
-    tmp.subLocal(this.body.position);
+    vec2 tmp = new vec2.copy(lightSource);
+    tmp.sub(this.body.position);
     tmp.normalize();
     
-    Vector first  = new Vector( tmp.y, -tmp.x);
-    Vector second = new Vector(-tmp.y,  tmp.x);
+    vec2 first  = new vec2( tmp.y, -tmp.x);
+    vec2 second = new vec2(-tmp.y,  tmp.x);
     
-    first.mulLocal(this.shape.radius);
-    second.mulLocal(this.shape.radius);
+    first = first * this.shape.radius;
+    second = first * this.shape.radius;
     
-    first.addLocal(this.body.position);
-    second.addLocal(this.body.position);
+    first.add(this.body.position);
+    second.add(this.body.position);
     
     Game.convertWorldToCanvas(first);
     Game.convertWorldToCanvas(second);

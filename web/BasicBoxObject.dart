@@ -1,12 +1,12 @@
 
-part of droidtowers;
+part of physics_after_dart;
 
 abstract class BasicBoxObject extends GameObject {
   
 
-  List<Vector> getRotatedVerticies([Vector lightSource]) {
+  List<vec2> getRotatedVerticies([vec2 lightSource]) {
     
-    List<Vector> verticies = new List<Vector>();
+    List<vec2> verticies = new List<vec2>();
     
     double _xpos = this.body.position.x.toDouble();
     double _ypos = -this.body.position.y.toDouble();
@@ -21,22 +21,22 @@ abstract class BasicBoxObject extends GameObject {
     tX = -(hWidth * Math.cos(rad) - hHeight * Math.sin(rad) ) + _xpos;
     tY = -(hWidth * Math.sin(rad) + hHeight * Math.cos(rad) ) + _ypos;
     
-    verticies.add(new Vector(tX, -tY));
+    verticies.add(new vec2(tX, -tY));
     
     tX = -(hWidth * Math.cos(rad) + hHeight * Math.sin(rad) ) + _xpos;
     tY = -(hWidth * Math.sin(rad) - hHeight * Math.cos(rad) ) + _ypos;
     
-    verticies.add(new Vector(tX, -tY));
+    verticies.add(new vec2(tX, -tY));
     
     tX = (hWidth * Math.cos(rad) - hHeight * Math.sin(rad) ) + _xpos;
     tY = (hWidth * Math.sin(rad) + hHeight * Math.cos(rad) ) + _ypos;
     
-    verticies.add(new Vector(tX, -tY));
+    verticies.add(new vec2(tX, -tY));
     
     tX = (hWidth * Math.cos(rad) + hHeight * Math.sin(rad) ) + _xpos;
     tY = (hWidth * Math.sin(rad) - hHeight * Math.cos(rad) ) + _ypos;
     
-    verticies.add(new Vector(tX, -tY));
+    verticies.add(new vec2(tX, -tY));
     
     return verticies;
   }

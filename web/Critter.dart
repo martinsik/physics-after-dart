@@ -1,12 +1,12 @@
 
-part of droidtowers;
+part of physics_after_dart;
 
 class Critter extends Circle {
   
   double opacity = 1.0;
   bool fadeOut = false;
   
-  Critter(double radius, Vector position): super() {
+  Critter(double radius, vec2 position): super() {
     
     this.width = radius;
     this.height = radius;

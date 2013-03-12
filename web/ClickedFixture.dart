@@ -1,9 +1,9 @@
 
-part of droidtowers;
+part of physics_after_dart;
 
 class ClickedFixture extends QueryCallback {
   
-  Vector mousePos;
+  vec2 mousePos;
   
   bool reportFixture(Fixture fixture) {
     //print((fixture.userData as GameObject).tag);
@@ -12,7 +12,7 @@ class ClickedFixture extends QueryCallback {
 //    GameObject box = fixture.userData;
     if (fixture.userData is DynamicBox) {
       DynamicBox box = fixture.userData;
-      Matrix22 rotMatrix = new Matrix22.fromAngle(box.body.angle);
+      mat2 rotMatrix = new mat2.rotation(box.body.angle);
       Transform trans = new Transform();
       trans.setFromPositionAndRotation(box.body.position, rotMatrix);
       
