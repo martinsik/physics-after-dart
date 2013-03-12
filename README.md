@@ -3,7 +3,7 @@ Physics After Dart
 
 This game is my Geeva Hackathon 2013 project in [Dart] [0] and [dartbox2d] [1]. 
 
-It's a simple puzzle game based of physics. I managed to make only 3 levels during the hackathon and your goal is to help 3 or 5 balls to get to the white triangle. Pretty simple :).
+It's a simple puzzle game based of physics. I managed to make only 3 levels during the hackathon where your goal is to help 3 or 5 balls to get to the white triangle. Pretty simple :).
 
 [You can try live demo here] [2].
 
@@ -28,14 +28,14 @@ About
 When I saw [indie game Thomas Was Alone] [3] I absolutely loved how each object casts shadow. It's such a simple effect but it enhances the entire game experience so much so I wanted to make something similar.  
 Well, I did although the algorhitm I'm using right now isn't very efficient. It's based on three canvases that has to be copied on the top of each other (there are some limitation by the canvas element itself). I belive that this part can be improved significantly. I'll try to explain how the shadow casting work on my blog soon.
 
-I want to keep this repo as an open source "game engine" and build on top of it standalone game that I'll publish on Chrome App (probably for money).
+I want to keep this repository as an open source "game engine" and build on top of it standalone game that I'll publish on Chrome App (probably for money).
 
-I called this game "PhysicsAfterDark" first but I think this name is more stylish :).
+I called this game PhysicsAfterDark at first but I think this name is more stylish :).
 
 Licence
 -------
 
-Physics After Dart is licensed under the [Beerware license] [4].
+Physics After Dart is licensed under the [Beerware license] [4] right now but it will change soon.
 
 The only things I didn't make on my own are [dartbox2d] [1] physics engine and box textures.
 
