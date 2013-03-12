@@ -27,7 +27,7 @@ class Circle extends GameObject {
     vec2 second = new vec2(-tmp.y,  tmp.x);
     
     first = first * this.shape.radius;
-    second = first * this.shape.radius;
+    second = second * this.shape.radius;
     
     first.add(this.body.position);
     second.add(this.body.position);
