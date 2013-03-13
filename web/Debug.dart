@@ -118,14 +118,14 @@ class Debug {
     this.debugShadowsButtonElm.text = "shadows: ${Debug.showShadows ? 'on' : 'off'}";
     
 //    this.updateInterval = new Future.delayed(const Duration(seconds: 1), () {
-    this.fpsInterval = new Future.delayed(const Duration(milliseconds: 200), this._updateWindow);
+//    this.fpsInterval = new Future.delayed(const Duration(milliseconds: 200), this._updateWindow);
   }
     
   void _updateFPSCounter() {
     this.lastSecondframeCount = thisSecondframeCount;
     this.thisSecondframeCount = 0;
     
-    this.updateInterval = new Future.delayed(const Duration(seconds: 1), this._updateFPSCounter);
+//    this.updateInterval = new Future.delayed(const Duration(seconds: 1), this._updateFPSCounter);
   }
 }
 
