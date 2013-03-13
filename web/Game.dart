@@ -28,7 +28,7 @@ class Game {
   static const num GRAVITY = -50;
   static const num TIME_STEP = 1/60;
   static const int VELOCITY_ITERATIONS = 10;
-  static const int POSITION_ITERATIONS = 15;
+  static const int POSITION_ITERATIONS = 10;
   static const int VIEWPORT_SCALE = 10;
   static const int MOVE_VELOCITY = 5;
   static const int CRITTER_SPAWN_RADIUS = 6;
