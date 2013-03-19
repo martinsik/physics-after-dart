@@ -50,7 +50,8 @@ class Critter extends Circle {
     ctx.beginPath();
     ctx.translate(pos1x, pos1y);
     ctx.rotate(this.getCurrentAngle());
-    ctx.drawImage(this.texture, -radius, -radius, radius * 2, radius * 2);
+//    ctx.drawImage(this.texture, -radius, -radius, radius * 2, radius * 2);
+    ctx.drawImageAtScale(this.texture, new Rect(-radius, -radius, radius * 2, radius * 2));
     ctx.closePath();
     ctx.fill();
     ctx.restore();

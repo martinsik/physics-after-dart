@@ -1,4 +1,5 @@
-.packages
+.settings
 .idea
 pubspec.lock
 web/Game.dart.js*
+packages

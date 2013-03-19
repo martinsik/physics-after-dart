@@ -229,13 +229,13 @@ class LightEngine {
       
 //      this.tmpCtx.clearRect(box.body., 0, this.canvas.width, this.canvas.height);
 //      this.tmpCtx.rotate(angle)
-      this.secondTmpCtx.drawImage(this.canvasTmp, 0, 0, this.canvas.width, this.canvas.height);      
+      this.secondTmpCtx.drawImageAtScale(this.canvasTmp, new Rect(0, 0, this.canvas.width, this.canvas.height));      
 
     }
 
     
     this.ctx.globalAlpha = 0.3;
-    this.ctx.drawImage(this.secondCanvasTmp, 0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.drawImageAtScale(this.secondCanvasTmp, new Rect(0, 0, this.canvas.width, this.canvas.height));
     
 
     // draw ground level line for debuging purposes

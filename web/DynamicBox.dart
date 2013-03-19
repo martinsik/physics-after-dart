@@ -53,7 +53,8 @@ class DynamicBox extends BasicBoxObject {
     ctx.save();
     ctx.translate(pos1x, pos1y);
     ctx.rotate(this.getCurrentAngle());
-    ctx.drawImage(this.texture, -width / 2, -height / 2, this.width, this.height);
+//    ctx.drawImage(this.texture, );
+    ctx.drawImageAtScale(this.texture, new Rect(-width / 2, -height / 2, this.width, this.height));
     ctx.restore();
 
     
