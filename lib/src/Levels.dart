@@ -35,7 +35,7 @@ class Levels {
           [ -16.0, -34.0 ], [ -3.1, -34.0 ], [ -3.1, -24.0 ]
         ],
         "critters": {
-          "spawn_point": [ 27, 15 ],
+          "spawn_point": [ 27.0, 15.0 ],
           "count": 3,
           "seed": 123
         },
@@ -70,7 +70,7 @@ class Levels {
           [ -48.5, -34.0 ], [ -48.5, -25.0 ], [ -35.0, -34.0 ]
         ],
         "critters": {
-          "spawn_point": [ 27, 19 ],
+          "spawn_point": [ 27.0, 19.0 ],
           "count": 5,
           "seed": 321
         },
@@ -109,7 +109,7 @@ class Levels {
           [ -21.8, -34.0 ], [ -3.0, -34.0 ], [ -12.0, -28.0 ]
         ],
         "critters": {
-          "spawn_point": [ 35, 22 ],
+          "spawn_point": [ 35.0, 22.0 ],
           "count": 3,
           "seed": 321
         },

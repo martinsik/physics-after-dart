@@ -1,9 +1,6 @@
 
-//import 'package:box2d/box2d.dart';
-//import 'GameObject.dart';
-//import 'dart:math' as Math;
-
 part of physics_after_dart;
+
 
 class DynamicBox extends BasicBoxObject {
   
@@ -13,12 +10,12 @@ class DynamicBox extends BasicBoxObject {
   
   bool highlight = false;
   
-  List<vec2> previousRotatedVerticies;
+  List<Vector2> previousRotatedVerticies;
   
-  DynamicBox(vec2 size, vec2 position, double restitution, double density, [double angle = 0.0, double friction = 1.0]): super() {
+  DynamicBox(Vector2 size, Vector2 position, double restitution, double density, [double angle = 0.0, double friction = 1.0]): super() {
     
     this.shape = new PolygonShape();
-    this.shape.setAsBoxWithCenterAndAngle(size.x, size.y, new vec2(0, 0), angle * Game.DEGRE_TO_RADIAN);
+    this.shape.setAsBox(size.x, size.y, new Vector2.zero(), angle * Game.DEGRE_TO_RADIAN);
     
     this.activeFixtureDef = new FixtureDef();
     this.activeFixtureDef.restitution = restitution;
@@ -40,11 +37,11 @@ class DynamicBox extends BasicBoxObject {
   
   void addObjectToWorld(World world) {
     this.body = world.createBody(this.bodyDef);
-    this.body.createFixture(this.activeFixtureDef);
+    this.body.createFixtureFromFixtureDef(this.activeFixtureDef);
   }
 
   void draw(CanvasRenderingContext2D ctx) {
-    
+
     double pos1x = (this.body.position.x) * Game.VIEWPORT_SCALE + Game.canvasCenter.x;
     double pos1y = -(this.body.position.y) * Game.VIEWPORT_SCALE + Game.canvasCenter.y;
 //    double pos1x = (this.body.position.x - this.shape.vertices[2].x) * Game.VIEWPORT_SCALE + Game.canvasCenter.x;
@@ -54,7 +51,8 @@ class DynamicBox extends BasicBoxObject {
     ctx.translate(pos1x, pos1y);
     ctx.rotate(this.getCurrentAngle());
 //    ctx.drawImage(this.texture, );
-    ctx.drawImageAtScale(this.texture, new Rect(-width / 2, -height / 2, this.width, this.height));
+    
+    ctx.drawImageScaled(this.texture, -width / 2, -height / 2, this.width, this.height);
     ctx.restore();
 
     
@@ -79,7 +77,7 @@ class DynamicBox extends BasicBoxObject {
 
   }
   
-  List<vec2> getRotatedVerticies([vec2 lightSource]) {
+  List<Vector2> getRotatedVerticies([Vector2 lightSource]) {
 //    print(this.body.linearVelocity.length);
     if (this.body.linearVelocity.length < 0.01) {
 //      print('cached getRotatedVerticies');
@@ -87,7 +85,7 @@ class DynamicBox extends BasicBoxObject {
     } else {
 //    if (this.previousRotatedVerticies && )
 //      print('recalculate getRotatedVerticies');
-      List<vec2> boundary = super.getRotatedVerticies();
+      List<Vector2> boundary = super.getRotatedVerticies();
 //      boundary[0].mulLocal(0.5);
 //      boundary[1].mulLocal(0.5);
 //      boundary[2].mulLocal(0.5);
@@ -103,10 +101,10 @@ class DynamicBox extends BasicBoxObject {
   }
   
   void _drawStroke(CanvasRenderingContext2D ctx, String color, [int lineWidth]) {
-    if (!?lineWidth) {
+    if (lineWidth == null) {
       lineWidth = 1;
     }
-    List<vec2> boundary = this.getRotatedVerticies(null);
+    List<Vector2> boundary = this.getRotatedVerticies(null);
     ctx.beginPath();
     ctx.strokeStyle = color;
     ctx.lineWidth = lineWidth;

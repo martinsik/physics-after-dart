@@ -3,18 +3,21 @@ part of physics_after_dart;
 
 class ClickedFixture extends QueryCallback {
   
-  vec2 mousePos;
+  Vector2 mousePos;
   
   bool reportFixture(Fixture fixture) {
-    //print((fixture.userData as GameObject).tag);
+//    print((fixture.userData as GameObject).tag);
 //    print('clicked');
     
 //    GameObject box = fixture.userData;
     if (fixture.userData is DynamicBox) {
       DynamicBox box = fixture.userData;
-      mat2 rotMatrix = new mat2.rotation(box.body.angle);
-      Transform trans = new Transform();
-      trans.setFromPositionAndRotation(box.body.position, rotMatrix);
+      Transform trans = new Transform.from(box.body.position, new Rot.withAngle(box.body.getAngle()));
+//      trans.setVec2Angle(box.body.position, box.body.getAngle());
+      
+//      print(box.body.getAngle());
+//      print(box.body.position);
+//      print(this.mousePos);
       
       if (box.shape.testPoint(trans, this.mousePos)) {
         box.hovered = true;

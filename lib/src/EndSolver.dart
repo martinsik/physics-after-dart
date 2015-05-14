@@ -3,12 +3,12 @@ part of physics_after_dart;
 
 class EndSolver {
   
-  List<vec2> endPoints;
+  List<Vector2> endPoints;
   List<Critter> critters;
-  vec2 spawnPoint;
+  Vector2 spawnPoint;
   Game game;
   
-  EndSolver(List<vec2> endPoints, vec2 spawnPoint, List<Critter> critters, Game game):
+  EndSolver(List<Vector2> endPoints, Vector2 spawnPoint, List<Critter> critters, Game game):
     this.endPoints = endPoints,
     this.game = game,
     this.spawnPoint = spawnPoint,
@@ -33,10 +33,9 @@ class EndSolver {
     ctx.globalAlpha = 0.8;
     ctx.stroke();
 
-    
     ctx.beginPath();
     ctx.arc((this.spawnPoint.x + Game.CRITTER_SPAWN_RADIUS / 2) * Game.VIEWPORT_SCALE + Game.canvasCenter.x,
-            (-this.spawnPoint.y - Game.CRITTER_SPAWN_RADIUS / 2) * Game.VIEWPORT_SCALE + Game.canvasCenter.y, Game.CRITTER_SPAWN_RADIUS * Game.VIEWPORT_SCALE, 0, 2 * Math.PI, false);
+            (-this.spawnPoint.y - Game.CRITTER_SPAWN_RADIUS / 2) * Game.VIEWPORT_SCALE + Game.canvasCenter.y, Game.CRITTER_SPAWN_RADIUS * Game.VIEWPORT_SCALE, 0, 2 * math.PI, false);
     ctx.fillStyle = "#fff";
     ctx.lineWidth = 2;
     ctx.closePath();
@@ -63,12 +62,12 @@ class EndSolver {
   }
   
   
-  double _sign(vec2 p1, vec2 p2, vec2 p3)
+  double _sign(Vector2 p1, Vector2 p2, Vector2 p3)
   {
     return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
   }
 
-  bool _pointInTriangle(vec2 pt, vec2 v1, vec2 v2, vec2 v3)
+  bool _pointInTriangle(Vector2 pt, Vector2 v1, Vector2 v2, Vector2 v3)
   {
     bool b1, b2, b3;
 

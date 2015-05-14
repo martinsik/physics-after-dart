@@ -1,7 +1,7 @@
 Physics After Dart
 =================
 
-This game is my Geeva Hackathon 2013 project in [Dart] [0] and [dartbox2d] [1]. 
+This game is my Geeva Hackathon 2013 project in [Dart] [0] and [box2d.dart] [1]. 
 
 It's a simple puzzle game based of physics. I managed to make only 3 levels during the hackathon where your goal is to help 3 or 5 balls to get to the white triangle. Pretty simple :).
 
@@ -41,7 +41,7 @@ The only things I didn't make on my own are [dartbox2d] [1] physics engine and b
 
 
   [0]: http://www.dartlang.org/ "Dart"
-  [1]: https://code.google.com/p/dartbox2d/ "dartbox2d"
+  [1]: https://github.com/google/box2d.dart "box2d.dart"
   [2]: http://martinsikora.com/physics-after-dart/web/index.html "live demo"
   [3]: http://store.steampowered.com/app/220780/ "Thomas Was Alone"
   [4]: http://en.wikipedia.org/wiki/Beerware#License "Beerware license"

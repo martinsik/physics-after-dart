@@ -12,17 +12,17 @@ class LightEngine {
   CanvasElement secondCanvasTmp;
   double groundLevel;
   
-  List<vec2> lights;
+  List<Vector2> lights;
   
-  vec2 bottomPoint;
-  vec2 bottomVector;
-  vec2 canvasSun;
+  Vector2 bottomPoint;
+  Vector2 bottomVector;
+  Vector2 canvasSun;
   
   
 //  LightEngine(Vector pos) : this.position = pos;
   
   LightEngine(CanvasElement elm, CanvasRenderingContext2D mainCtx, double groundLevel) {
-    this.lights = new List<vec2>();
+    this.lights = new List<Vector2>();
     this.canvas = elm;
     this.groundLevel = groundLevel;
     this.canvasTmp = new Element.tag('canvas');
@@ -38,19 +38,19 @@ class LightEngine {
     this.secondTmpCtx = this.secondCanvasTmp.getContext("2d");
     this.mainCtx = mainCtx;
     
-    this.bottomPoint = new vec2(0, this.groundLevel);
+    this.bottomPoint = new Vector2(0.0, this.groundLevel);
     Game.convertWorldToCanvas(this.bottomPoint);
-    this.bottomVector = new vec2(Game.canvasCenter.x * 2, this.groundLevel);
+    this.bottomVector = new Vector2(Game.canvasCenter.x * 2, this.groundLevel);
     Game.convertWorldToCanvas(this.bottomVector);
   }
   
   
-  void add(vec2 lightPosition) {
+  void add(Vector2 lightPosition) {
 //    Vector newLight = new Vector.copy(point);
     this.lights.add(lightPosition);
     
     if (this.lights.length == 1) {
-      this.canvasSun = new vec2.copy(this.lights[0]);
+      this.canvasSun = new Vector2.copy(this.lights[0]);
       Game.convertWorldToCanvas(this.canvasSun);
     }
 //    return newLight;
@@ -85,7 +85,7 @@ class LightEngine {
     
     
     for (var box in objects) {
-      List<vec2> verticies;
+      List<Vector2> verticies;
       verticies = box.getRotatedVerticies(this.lights[0]);
       
       this.canvasTmp.width = this.canvasTmp.width;
@@ -94,7 +94,7 @@ class LightEngine {
       
 //      Vector intersect = new Vector();
 
-      List<vec2> intersections = new List<vec2>();
+      List<Vector2> intersections = new List<Vector2>();
       
       double minX = double.MAX_FINITE;
       double maxX = -double.MAX_FINITE;
@@ -103,8 +103,8 @@ class LightEngine {
             
 //      for (Vector vertex in verticies) {
       for (int i=0; i < verticies.length; i++) {
-        vec2 intersect = new vec2();
-        vec2 vertex = verticies[i];
+        Vector2 intersect = new Vector2.zero();
+        Vector2 vertex = verticies[i];
         this._isIntersecting(canvasSun, vertex, this.bottomPoint, this.bottomVector, intersect);
 //        Vector nv = new Vector.copy(intersect);
         
@@ -218,7 +218,7 @@ class LightEngine {
         this.tmpCtx.beginPath();
         this.tmpCtx.translate(pos1x, pos1y);
         this.tmpCtx.fillStyle = "#f00";
-        this.tmpCtx.arc(0, 0, box.shape.radius * Game.VIEWPORT_SCALE / 2, 0, Math.PI * 2, true); 
+        this.tmpCtx.arc(0, 0, box.shape.radius * Game.VIEWPORT_SCALE / 2, 0, math.PI * 2, true);
         this.tmpCtx.closePath();
         this.tmpCtx.fill();
         this.tmpCtx.restore();
@@ -229,13 +229,13 @@ class LightEngine {
       
 //      this.tmpCtx.clearRect(box.body., 0, this.canvas.width, this.canvas.height);
 //      this.tmpCtx.rotate(angle)
-      this.secondTmpCtx.drawImageAtScale(this.canvasTmp, new Rect(0, 0, this.canvas.width, this.canvas.height));      
+      this.secondTmpCtx.drawImageScaled(this.canvasTmp, 0, 0, this.canvas.width, this.canvas.height);
 
     }
 
     
     this.ctx.globalAlpha = 0.3;
-    this.ctx.drawImageAtScale(this.secondCanvasTmp, new Rect(0, 0, this.canvas.width, this.canvas.height));
+    this.ctx.drawImageScaled(this.secondCanvasTmp, 0, 0, this.canvas.width, this.canvas.height);
     
 
     // draw ground level line for debuging purposes
@@ -253,7 +253,7 @@ class LightEngine {
     
   }
   
-  bool _isIntersecting(vec2 p1, vec2 p2, vec2 p3, vec2 p4, vec2 out)
+  bool _isIntersecting(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, Vector2 out)
   {
     double denominator = ((p1.x - p2.x) * (p3.y - p4.y)) - ((p1.y - p2.y) * (p3.x - p4.x));
     double numerator1 = (p1.x * p2.y - p1.y * p2.x) * (p3.x - p4.x) - ((p1.x - p2.x) * (p3.x * p4.y - p3.y * p4.x));

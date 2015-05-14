@@ -12,19 +12,19 @@ class Circle extends GameObject {
   
   void addObjectToWorld(World world) {
     this.body = world.createBody(this.bodyDef);
-    this.body.createFixture(this.activeFixtureDef);
+    this.body.createFixtureFromFixtureDef(this.activeFixtureDef);
   }
   
   void draw(CanvasRenderingContext2D ctx) { }
   
-  List<vec2> getRotatedVerticies(vec2 lightSource) {
+  List<Vector2> getRotatedVerticies(Vector2 lightSource) {
     
-    vec2 tmp = new vec2.copy(lightSource);
+    Vector2 tmp = new Vector2.copy(lightSource);
     tmp.sub(this.body.position);
     tmp.normalize();
     
-    vec2 first  = new vec2( tmp.y, -tmp.x);
-    vec2 second = new vec2(-tmp.y,  tmp.x);
+    Vector2 first  = new Vector2( tmp.y, -tmp.x);
+    Vector2 second = new Vector2(-tmp.y,  tmp.x);
     
     first = first * this.shape.radius;
     second = second * this.shape.radius;

@@ -3,13 +3,13 @@ part of physics_after_dart;
 
 class DragHandler {
   
-  vec2 _destionationPos;
+  Vector2 _destionationPos;
   
-  vec2 relativeDistanceFromObjectCenter;
+  Vector2 relativeDistanceFromObjectCenter;
   
   DynamicBox _activeObject;
   
-  vec2 _mousePosStart;
+  Vector2 _mousePosStart;
     
   bool _active = false;
   
@@ -17,7 +17,7 @@ class DragHandler {
   bool rotateRight = false;
   bool rotateToDefault = false;
   
-  void activate(vec2 mousePosStart, DynamicBox obj) {
+  void activate(Vector2 mousePosStart, DynamicBox obj) {
     this._active = true;
 //    if (?obj) {
     this._activeObject = obj;
@@ -42,24 +42,24 @@ class DragHandler {
     }
   }
   
-  void setStartPos(vec2 newStartPos) {
+  void setStartPos(Vector2 newStartPos) {
     this._mousePosStart = newStartPos;
   }
   
-  void setDestination(vec2 point) {
+  void setDestination(Vector2 point) {
     this._destionationPos = point;
   }
   
-  vec2 getCorrectedDestination() {
-    return new vec2(this._destionationPos.x - this.relativeDistanceFromObjectCenter.x,
+  Vector2 getCorrectedDestination() {
+    return new Vector2(this._destionationPos.x - this.relativeDistanceFromObjectCenter.x,
                       this._destionationPos.y - this.relativeDistanceFromObjectCenter.y);
   }
   
-  double distanceFromStart(vec2 point) {
+  double distanceFromStart(Vector2 point) {
     return distance(this._mousePosStart, point);
   }
   
-  double distanceFromStartAndUpdate(vec2 point) {
+  double distanceFromStartAndUpdate(Vector2 point) {
     double dist = distance(this._mousePosStart, point);
     this.setStartPos(point);
     return dist;

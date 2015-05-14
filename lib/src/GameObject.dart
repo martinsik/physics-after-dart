@@ -1,6 +1,4 @@
 
-//import 'package:box2d/box2d.dart';
-
 part of physics_after_dart;
 
 abstract class GameObject {
@@ -12,7 +10,7 @@ abstract class GameObject {
   
   Shape shape;
   
-  Body body;
+  box2d.Body body;
   
   ImageElement texture;
   
@@ -31,7 +29,7 @@ abstract class GameObject {
   }
   
   double getCurrentAngle() {
-    return -this.body.angle - this.origAngle; 
+    return -this.body.getAngle() - this.origAngle; 
   }
   
   

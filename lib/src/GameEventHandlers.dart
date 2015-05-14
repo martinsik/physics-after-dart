@@ -12,7 +12,7 @@ class GameEventHandlers {
   
   void onMouseDown(MouseEvent e) {
 //      Vector pointClicked = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
-    vec2 pointClicked = Game.convertCanvasToWorld(new vec2(e.clientX - Game.canvasOffset.x, e.clientY - Game.canvasOffset.y));
+    Vector2 pointClicked = Game.convertCanvasToWorld(new Vector2(e.client.x - Game.canvasOffset.x, e.client.y - Game.canvasOffset.y));
     this.dragHandler.deactivate();
     
     for (GameObject o in game.dynamicObjects) {
@@ -26,7 +26,7 @@ class GameEventHandlers {
         this.dragHandler.activate(pointClicked, o);
         this.dragHandler.setDestination(pointClicked);
         
-        vec2 diffFromObjectCenter = new vec2.copy(pointClicked);
+        Vector2 diffFromObjectCenter = new Vector2.copy(pointClicked);
         diffFromObjectCenter.sub(o.body.position);
         this.dragHandler.relativeDistanceFromObjectCenter = diffFromObjectCenter;
 //          print("tag: ${o.tag}");
@@ -47,11 +47,11 @@ class GameEventHandlers {
       o.hovered = false;
     }
     ClickedFixture callback = new ClickedFixture();
-    vec2 mousePos = Game.convertCanvasToWorld(new vec2(e.clientX - Game.canvasOffset.x, e.clientY - Game.canvasOffset.y));
+    Vector2 mousePos = Game.convertCanvasToWorld(new Vector2(e.client.x - Game.canvasOffset.x, e.client.y - Game.canvasOffset.y));
 //      callback.mousePos = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
     callback.mousePos = mousePos;
     
-    AxisAlignedBox aabb = new AxisAlignedBox(mousePos, mousePos);
+    var aabb = new AABB.withVec2(mousePos, mousePos);
     game.world.queryAABB(callback, aabb);
     
     if (this.dragHandler.isActive()) {

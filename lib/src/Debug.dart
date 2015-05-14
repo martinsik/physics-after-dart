@@ -34,10 +34,10 @@ class Debug {
   Future fpsInterval;
   
   Debug() {
-    this.debugElm = query("#debug");
-    this.debugTimingElm = query("#debug_timing");
-    this.debugTexturesButtonElm = query("#debug_textures_button");
-    this.debugShadowsButtonElm = query("#debug_shadows_button");
+    this.debugElm = querySelector("#debug");
+    this.debugTimingElm = querySelector("#debug_timing");
+    this.debugTexturesButtonElm = querySelector("#debug_textures_button");
+    this.debugShadowsButtonElm = querySelector("#debug_shadows_button");
     
     this.physicsStopwatch = new Stopwatch();
     this.dynamicDrawStopwatch = new Stopwatch();

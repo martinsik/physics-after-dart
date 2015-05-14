@@ -4,7 +4,7 @@ part of physics_after_dart;
 class Common {
   
   static List shuffle(List items) {
-    var random = new Math.Random();
+    var random = new math.Random();
 
     // Go through all elements.
     for (var i = items.length - 1; i > 0; i--) {

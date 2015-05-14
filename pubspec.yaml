@@ -1,7 +1,8 @@
 name: physics_after_dart
 version: 0.1.0
 author: Martin Sikora
-homepage: http://martinsikora.com
+homepage: http://ahoj.io
 dependencies:
-  box2d: any
+  box2d: 0.2.0
   browser: any
+  vector_math: any
