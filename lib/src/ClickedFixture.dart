@@ -1,38 +1,37 @@
-
 part of physics_after_dart;
 
 class ClickedFixture extends QueryCallback {
-  
   Vector2 mousePos;
-  
+
   bool reportFixture(Fixture fixture) {
 //    print((fixture.userData as GameObject).tag);
 //    print('clicked');
-    
+
 //    GameObject box = fixture.userData;
     if (fixture.userData is DynamicBox) {
       DynamicBox box = fixture.userData;
-      Transform trans = new Transform.from(box.body.position, new Rot.withAngle(box.body.getAngle()));
+      Transform trans = new Transform.from(
+          box.body.position, new Rot.withAngle(box.body.getAngle()));
 //      trans.setVec2Angle(box.body.position, box.body.getAngle());
-      
+
 //      print(box.body.getAngle());
 //      print(box.body.position);
 //      print(this.mousePos);
-      
+
       if (box.shape.testPoint(trans, this.mousePos)) {
         box.hovered = true;
       }
     }
-    
+
     return true;
 
 //    if (fixture.userData is DynamicBox) {
 //      double maxHoriz = Game.canvasCenter.x / Game.VIEWPORT_SCALE;
 //      double maxVert = Game.canvasCenter.y / Game.VIEWPORT_SCALE;
-//      
+//
 //      DynamicBox box = fixture.userData;
 //      List<Vector> verticies = box.getRotatedVerticies();
-//      
+//
 //      for (int j=0; j < 4; j++) {
 //        int crosses = 0;
 //        Vector v;
@@ -50,25 +49,25 @@ class ClickedFixture extends QueryCallback {
 //          if (this._isIntersecting(verticies[i], verticies[i+1 == verticies.length ? 0 : i+1], this.clickedPos, v)) {
 //            crosses++;
 //          }
-//          
+//
 ////          if (crosses > 1) {
 ////            break;
 ////          }
 //        }
 //        print("${box.tag}, $j: $crosses");
-//        
+//
 //        if (crosses > 1) {
 ////          print("${box.tag}: $crosses");
 //          break;
 //        }
 //      }
-//      
+//
 ////      print(crosses);
 //    }
 //
 //    return true;
   }
-  
+
   //bool _isIntersecting(Point a, Point b, Point c, Point d)
 //  bool _isIntersecting(Vector p1, Vector p2, Vector p3, Vector p4)
 //  {
@@ -87,6 +86,5 @@ class ClickedFixture extends QueryCallback {
 //
 //    return (r >= 0 && r <= 1) && (s >= 0 && s <= 1);
 //}
-  
-}
 
+}

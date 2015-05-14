@@ -1,8 +1,6 @@
-
 part of physics_after_dart;
 
 class Common {
-  
   static List shuffle(List items) {
     var random = new math.Random();
 
@@ -19,6 +17,4 @@ class Common {
 
     return items;
   }
-  
 }
-
