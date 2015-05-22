@@ -8,8 +8,8 @@ class Game {
   static const double VIEWPORT_SCALE = 10.0;
   static const int MOVE_VELOCITY = 5;
   static const int CRITTER_SPAWN_RADIUS = 6;
-  static const int CANVAS_WIDTH = 1000;
-  static const int CANVAS_HEIGHT = 700;
+  static const int CANVAS_WIDTH = 1024;
+  static const int CANVAS_HEIGHT = 768;
   static const double DEGRE_TO_RADIAN = 0.0174532925;
   static const int WORLD_POOL_SIZE = 100;
   static const int WORLD_POOL_CONTAINER_SIZE = 10;
@@ -25,7 +25,7 @@ class Game {
   List<GameObject> dynamicObjects;
   List<Critter> critters;
 
-  int canvasFpsCounter = 0;
+//  int canvasFpsCounter = 0;
   double canvasWorldStepTime = 0.0;
 
   // The debug drawing tool.
@@ -42,6 +42,7 @@ class Game {
   DivElement wrapperElm;
   DivElement progressElm;
   DivElement doneElm;
+  DivElement gameElm;
 
   // The canvas rendering context.
   CanvasRenderingContext2D ctx;
@@ -93,6 +94,7 @@ class Game {
     this.wrapperElm = querySelector("#wrapper");
     this.progressElm = querySelector("#level_progess");
     this.doneElm = querySelector("#done");
+    this.gameElm = querySelector("#game");
 
     this.debug = new Debug();
 
@@ -153,11 +155,11 @@ class Game {
 
     this._createBoxes(this.level['boxes']);
     this._createGround(this.groundHeight, this.level['grounds']);
-    this.wrapperElm.style.backgroundImage =
+    this.canvas.style.backgroundImage =
         "url(./images/${this.level['background']})";
-    double aspect = this.canvas.height / 1000.0;
-    this.wrapperElm.style.backgroundSize =
-        "${aspect * 1500}px ${aspect * 1000}px";
+//    double aspect = this.canvas.height / 1000.0;
+//    this.wrapperElm.style.backgroundSize =
+//        "${aspect * 1500}px ${aspect * 1000}px";
 
     // add start and end triangles
 //    List points = level['start'];
@@ -176,17 +178,26 @@ class Game {
   }
 
   void _initListeners() {
-    this.shadowCanvas.onMouseDown.listen((e) {
-      eventHandler.onMouseDown(e);
+    shadowCanvas.onMouseDown
+        .listen((e) => eventHandler.onObjectGrab(e.client.x, e.client.y));
+
+    shadowCanvas.onTouchStart.listen((e) {
+      Touch touch = e.touches[0];
+      eventHandler.onObjectGrab(touch.client.x, touch.client.y);
     });
 
-    this.shadowCanvas.onMouseUp.listen((e) {
-      eventHandler.onMouseUp(e);
-    });
+    shadowCanvas.onMouseUp.listen((e) => eventHandler.onObjectReleased());
+    shadowCanvas.onTouchEnd.listen((e) => eventHandler.onObjectReleased());
 
-    this.shadowCanvas.onMouseMove.listen((e) {
+    shadowCanvas.onMouseMove.listen((e) {
       if (!running) {
-        eventHandler.onMouseMove(e);
+        eventHandler.onMouseMove(e.client.x, e.client.y);
+      }
+    });
+    shadowCanvas.onTouchMove.listen((e) {
+      Touch touch = e.touches[0];
+      if (!running) {
+        eventHandler.onMouseMove(touch.client.x, touch.client.y);
       }
     });
 
@@ -234,9 +245,7 @@ class Game {
       }
     });
 
-    window.onResize.listen((e) {
-      resizeCanvas();
-    });
+    window.onResize.listen(resizeCanvas);
 
     // bind start button click
     this.mainButtonElm.onClick.listen((e) {
@@ -325,26 +334,21 @@ class Game {
     }
   }
 
-  void resizeCanvas() {
-//    print('resize: [${window.innerWidth}, ${window.innerHeight}]');
-//    int height = window.innerHeight > 706 ? 706 : ;
-//    int height = 700;
-//    int width = 1000;
+  void resizeCanvas([_]) {
     this.canvas.width = CANVAS_WIDTH;
     this.canvas.height = CANVAS_HEIGHT;
-//    this.shadowCanvas.width = CANVAS_WIDTH;
-//    this.shadowCanvas.height = CANVAS_HEIGHT;
+
+    this.shadowCanvas.width = this.canvas.offsetWidth;
+    this.shadowCanvas.height = this.canvas.offsetHeight;
+
     this.shadowCanvas.width = CANVAS_WIDTH ~/ 2; // ~/ integer division
     this.shadowCanvas.height = CANVAS_HEIGHT ~/ 2;
-    this.wrapperElm.style.width = "${CANVAS_WIDTH}px";
-    this.wrapperElm.style.height = "${CANVAS_HEIGHT}px";
 
     Game.canvasCenter = new Vector2(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
-    Game.canvasOffset = new Vector2((window.innerWidth - CANVAS_WIDTH) / 2,
-        (window.innerHeight - CANVAS_HEIGHT) / 2);
+    Game.canvasOffset = new Vector2(
+        this.canvas.clientLeft.toDouble(), this.canvas.clientTop.toDouble());
 
-    this.wrapperElm.style.top = "${canvasOffset.y}px";
-    this.wrapperElm.style.left = "${canvasOffset.x}px";
+//    print("${Game.canvasCenter.toString()} ${Game.canvasOffset.toString()}");
   }
 
   void startCritters() {
@@ -391,7 +395,7 @@ class Game {
           this.debug.physicsStopwatch.elapsedMicroseconds;
     }
 
-    // am I draging something?
+    // Am I draging anything?
     if (this.eventHandler.dragHandler.isActive()) {
 //      double dist = this.eventHandler.dragHandler.objectDistanceToDestination();
       GameObject obj = this.eventHandler.dragHandler.getActiveObject();
@@ -413,7 +417,7 @@ class Game {
 
     window.requestAnimationFrame((num time) {
       _step(time);
-      _draw();
+      _draw(time);
 
       if (Debug.isEnabled()) {
         this.debug.endSolverStopwatch.reset();
@@ -429,7 +433,7 @@ class Game {
     });
   }
 
-  void _draw() {
+  void _draw(double time) {
     // Clear the animation panel and draw new frame.
 //    ctx.fillStyle = "#fff";
 //    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -499,6 +503,7 @@ class Game {
     }
     // draw shadowns
     this.lightEngine.draw(this.dynamicObjects);
+
     if (Debug.isEnabled()) {
       this.debug.shadowElapsedUs =
           this.debug.shadowsStopwatch.elapsedMicroseconds;

@@ -53,8 +53,8 @@ class Debug {
       this._updateWindow();
     });
 
-    this._updateWindow();
-    this._updateFPSCounter();
+//    this._updateWindow();
+//    this._updateFPSCounter();
   }
 
   void showDebugWindow() {
@@ -66,22 +66,10 @@ class Debug {
 
     Debug._showWindow = true;
 
-    // var future = new Future.delayed(const Duration(milliseconds: 10), doStuffCallback);
-//    this.updateInterval = new Future.delayed(const Duration(seconds: 1), () {
-//      this.lastSecondframeCount = thisSecondframeCount;
-//      this.thisSecondframeCount = 0;
-//    });
-
-    // this.fpsInterval = window.setInterval(() {
-//    this.fpsInterval = new Future.delayed(const Duration(milliseconds: 200), () {
-//      this._updateWindow();
-//      this.fpsInterval.
-//    });
-
-    // @TODO: Fix, stop timers with newer Dart SDK
-    // this._updateWindow();
-
     this.debugElm.style.display = "block";
+
+    this._updateWindow();
+    this._updateFPSCounter();
   }
 
   void hideDebugWindow() {
@@ -116,14 +104,18 @@ class Debug {
     this.debugShadowsButtonElm.text =
         "shadows: ${Debug.showShadows ? 'on' : 'off'}";
 
-//    this.updateInterval = new Future.delayed(const Duration(seconds: 1), () {
-//    this.fpsInterval = new Future.delayed(const Duration(milliseconds: 200), this._updateWindow);
+    // @todo: use Stream API
+    this.updateInterval =
+        new Future.delayed(const Duration(milliseconds: 200), _updateWindow);
   }
 
   void _updateFPSCounter() {
     this.lastSecondframeCount = thisSecondframeCount;
     this.thisSecondframeCount = 0;
 
+    // @todo: use Stream API
+    this.fpsInterval = new Future.delayed(
+        const Duration(milliseconds: 1000), _updateFPSCounter);
 //    this.updateInterval = new Future.delayed(const Duration(seconds: 1), this._updateFPSCounter);
   }
 }

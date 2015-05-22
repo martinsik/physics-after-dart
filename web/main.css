@@ -16,13 +16,16 @@ body {
   background-color: black;
   font-family: 'Open Sans', sans-serif;
   font-size: 14px;
+  overflow: hidden;
   /*font-weight: normal;
   line-height: 1.2em;*/
 }
 
 #wrapper {
-  max-width: 1000px;
-  max-height: 700px;
+  /*max-width: 1024px;
+  max-height: 768px;*/
+  /*height: 100%;
+  width: 100%;*/
   background-position: center bottom;
   background-repeat: no-repeat;
 }
@@ -45,20 +48,27 @@ h1, p {
   margin-top: 140px;
 }
 
+#game {
+  /*max-height: 100vh;*/
+  /*height: 100vh;*/
+}
+
 canvas {
   /*background: #fff;*/
-  position: absolute;
+  /*position: absolute;*/
   /*z-index: 100;*/
-  image-rendering: optimizeQuality;
+  /*image-rendering: optimizeQuality;*/
   /*max-height: 706px !important;
   max-width: 706px !important;*/
+  /*max-height: 100vh;*/
+  height: 100vh;
+  background-size: cover;
 }
 
 canvas#shadow_canvas {
-  width: 1000px;
-  height: 700px;
-  /*background: #ff0;*/
-  /*opacity: 0.5;*/
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 div {
@@ -190,8 +200,8 @@ div#debug_shadows_button {
 a#fork_on_github {
   font-size: 14px;
   height: 27px;
-  width: 70px;
+  width: 100px;
   padding-top: 6px;
-  left: 670px;
+  left: 640px;
   /*top: 70px;*/
 }

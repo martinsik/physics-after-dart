@@ -8,10 +8,12 @@ class GameEventHandlers {
       : this.dragHandler = new DragHandler(),
         this.game = game;
 
-  void onMouseDown(MouseEvent e) {
-//      Vector pointClicked = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
-    Vector2 pointClicked = Game.convertCanvasToWorld(new Vector2(
-        e.client.x - Game.canvasOffset.x, e.client.y - Game.canvasOffset.y));
+  void onObjectGrab(int x, int y) {
+    double scale = (Game.CANVAS_WIDTH / game.canvas.offsetWidth);
+
+    Vector2 canvasPos =
+        new Vector2(x - Game.canvasOffset.x, y - Game.canvasOffset.y);
+    Vector2 pointClicked = Game.convertCanvasToWorld(canvasPos * scale);
     this.dragHandler.deactivate();
 
     for (GameObject o in game.dynamicObjects) {
@@ -35,28 +37,41 @@ class GameEventHandlers {
     }
   }
 
-  void onMouseUp(MouseEvent e) {
+//  void
+//
+//  void onMouseDown(MouseEvent e) => onObjectDrag(e.client.x, e.client.y);
+
+  void onObjectReleased() {
     if (this.dragHandler.isActive()) {
       this.dragHandler.getActiveObject().highlight = false;
       this.dragHandler.deactivate();
     }
   }
 
-  void onMouseMove(MouseEvent e) {
+  void onMouseMove(int x, int y) {
     for (GameObject o in game.dynamicObjects) {
       o.hovered = false;
     }
-    ClickedFixture callback = new ClickedFixture();
-    Vector2 mousePos = Game.convertCanvasToWorld(new Vector2(
-        e.client.x - Game.canvasOffset.x, e.client.y - Game.canvasOffset.y));
-//      callback.mousePos = new Vector((e.clientX - Game.canvasCenter.x) / Game.VIEWPORT_SCALE, (Game.canvasCenter.y - e.clientY) / Game.VIEWPORT_SCALE);
-    callback.mousePos = mousePos;
+//    print(e.client.x, e.client.y);
 
-    var aabb = new AABB.withVec2(mousePos, mousePos);
+    ClickedFixture callback = new ClickedFixture();
+    double scale = (Game.CANVAS_WIDTH / game.canvas.offsetWidth);
+
+    Vector2 canvasPos =
+        new Vector2(x - Game.canvasOffset.x, y - Game.canvasOffset.y);
+
+    Vector2 worldPos = Game.convertCanvasToWorld(canvasPos * scale);
+
+//    print("Center: ${Game.canvasCenter.toString()}");
+//    print("${canvasPos.toString()}, ${worldPos.toString()}");
+
+    callback.mousePos = worldPos;
+
+    var aabb = new AABB.withVec2(worldPos, worldPos);
     game.world.queryAABB(callback, aabb);
 
     if (this.dragHandler.isActive()) {
-      this.dragHandler.setDestination(mousePos);
+      this.dragHandler.setDestination(worldPos);
 //        double distance = mouseDragHandler.distanceFromStartAndUpdate(mousePos);
 //        print("distance: $distance");
     }

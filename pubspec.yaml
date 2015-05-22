@@ -6,3 +6,6 @@ dependencies:
   box2d: 0.2.0
   browser: any
   vector_math: any
+transforms:
+- $dart2js:
+  minify: true
